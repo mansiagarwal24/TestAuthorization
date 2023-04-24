@@ -1,21 +1,25 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.ProductModels;
 
+import com.ttn.bootcamp.project.bootcampproject.Entities.CompositeKey.ProductReviewsId;
 import com.ttn.bootcamp.project.bootcampproject.Entities.UserModels.Customer;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class ProductReviews {
+    @EmbeddedId
+    private ProductReviewsId productReviewsId;
+
+    private String review;
+    private int rating;
+
     @ManyToOne
     @JoinColumn(name = "customerUserId")
     private Customer customer;
-    private String review;
-    private int rating;
+
     @ManyToOne
     @JoinColumn(name="productId")
     private Product product;

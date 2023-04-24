@@ -1,17 +1,18 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.ProductModels;
 
+import com.ttn.bootcamp.project.bootcampproject.Entities.CompositeKey.CategoryMetaDataId;
+import com.ttn.bootcamp.project.bootcampproject.StringListConverter;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class CategoryMetadataFieldValues {
-    //medatdatafieldid(foreign key)
-    //categoryid(foreign key)
+    @EmbeddedId
+    private CategoryMetaDataId categoryMetadataId;
+
     @ManyToOne
     @JoinColumn(name = "categoryMetaDataFieldId")
     private CategoryMetadataField categoryMetadataFieldList;
@@ -20,7 +21,9 @@ public class CategoryMetadataFieldValues {
     @JoinColumn(name="categoryId")
     private Category categories;
 
-    @ElementCollection
-    List<String> value;
+
+    @Column
+    @Convert(converter = StringListConverter.class)
+    private List<String> value;
 
 }

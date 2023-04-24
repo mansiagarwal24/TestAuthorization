@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 public class ProductVariation {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="userid",sequenceName ="product_variation",initialValue = 1,allocationSize = 1)
     private Long id;
-    //product_id(foreign key)
     private int quantityAvailable;
     private Long price;
     private boolean isActive;

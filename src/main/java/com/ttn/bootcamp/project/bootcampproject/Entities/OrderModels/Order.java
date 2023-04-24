@@ -1,16 +1,16 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.OrderModels;
 
 import com.ttn.bootcamp.project.bootcampproject.Entities.UserModels.Customer;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.List;
 @Entity
 public class Order {
-    private Long Id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="userid",sequenceName ="order",initialValue = 1,allocationSize = 1)
+    private Long id;
     private Long amountPaid;
     private Date dateCreated;
     private String paymentMethod;

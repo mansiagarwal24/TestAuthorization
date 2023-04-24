@@ -1,14 +1,21 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.UserModels;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrimaryKeyJoinColumn;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
-@Getter
-@Setter
-@PrimaryKeyJoinColumn(name="userId")
+@Data
+//@PrimaryKeyJoinColumn(name="userId")
 public class Customer extends User{
-    private String contact;
+
+    private Long contact;
+
+    @OneToMany(mappedBy = "customer")
+    private List<Address> addressList;
 }

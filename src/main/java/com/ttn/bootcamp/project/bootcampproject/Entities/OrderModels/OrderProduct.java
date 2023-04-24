@@ -1,14 +1,16 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.OrderModels;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class OrderProduct {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="userid",sequenceName ="order_product",initialValue = 1,allocationSize = 1)
     private Long id;
     //ORDER_ID
     private int quantity;

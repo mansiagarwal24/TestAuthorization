@@ -1,17 +1,15 @@
 package com.ttn.bootcamp.project.bootcampproject.Entities.ProductModels;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 @Entity
-@Getter
-@Setter
+@Data
 public class CategoryMetadataField {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="userid",sequenceName ="category_metadata_field",initialValue = 1,allocationSize = 1)
     private Long id;
     private String name;
-
 
 }

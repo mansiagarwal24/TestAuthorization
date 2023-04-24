@@ -7,14 +7,13 @@ import jakarta.persistence.*;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="userid",sequenceName ="product",initialValue = 1,allocationSize = 1)
     private Long id;
-    //seller_user_id(foreign key)
     private String name;
     private String description;
 
-    //Category id
     private String brand;
-    private boolean isCancellable,isActive,isReturnable,isDeleted;
+    private boolean isCancellable=false,isActive=false,isReturnable=false,isDeleted=false;
     @ManyToOne
     @JoinColumn(name="sellerId")
     private Seller seller;
