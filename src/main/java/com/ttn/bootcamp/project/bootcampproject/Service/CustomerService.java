@@ -32,6 +32,6 @@ public class CustomerService {
         customerRepo.save(customer);
 
         emailService.sendMail(customer.getEmail(),jwtService.generateToken(customer.getEmail()));
-        return ResponseEntity.ok("Customer is created");
+        return ResponseEntity.ok("Customer is registered");
     }
 }

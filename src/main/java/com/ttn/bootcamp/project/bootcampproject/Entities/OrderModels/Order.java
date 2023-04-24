@@ -2,10 +2,12 @@ package com.ttn.bootcamp.project.bootcampproject.Entities.OrderModels;
 
 import com.ttn.bootcamp.project.bootcampproject.Entities.UserModels.Customer;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 @Entity
+@Data
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -20,6 +22,7 @@ public class Order {
     private String customerAddressLine;
     private int customerAddressZipCode;
     private String customerAddressLabel;
+
     @ManyToOne
     @JoinColumn(name = "customerUserId")
     private Customer customer;

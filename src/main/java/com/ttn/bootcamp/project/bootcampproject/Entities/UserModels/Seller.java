@@ -12,7 +12,7 @@ import lombok.Setter;
 //@PrimaryKeyJoinColumn(name="userId")
 public class Seller extends User{
     private String gst;
-    private String companyContact;
+    private Long companyContact;
     private String companyName;
 
     @OneToOne(mappedBy = "seller")

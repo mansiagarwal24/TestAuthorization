@@ -2,8 +2,6 @@ package com.ttn.bootcamp.project.bootcampproject.Entities.UserModels;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
@@ -21,14 +19,11 @@ public class User {
     private String middleName;
     private String lastName;
     private String password;
-    private boolean isDeleted,isActive,isExpired,isLocked = false;
+    private boolean isDeleted=false,isActive=false,isExpired=false,isLocked = false;
     private int invalidAttemptCount;
     private Date passwordUpdateDate;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private Set<Role> role;
-
-//    @OneToMany(mappedBy = "user")
-//    private Set<Address> address;
 
 }
