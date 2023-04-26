@@ -1,6 +1,6 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.productmodels;
+package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
-import com.ttn.bootcamp.project.bootcampproject.entities.usermodels.Seller;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
 
 @Entity

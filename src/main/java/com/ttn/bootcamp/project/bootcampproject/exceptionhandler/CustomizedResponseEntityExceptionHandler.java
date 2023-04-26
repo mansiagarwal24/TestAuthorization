@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject.globalexceptionhandler;
+package com.ttn.bootcamp.project.bootcampproject.exceptionhandler;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

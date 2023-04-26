@@ -1,14 +1,14 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 public class SellerDTO {
 
-    @Pattern(regexp = "^(.+)@(\\S+)$",message = "Email is not valid")
-    @Column(unique=true)
+    @Email(message = "Email is not valid")
     private String email;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,15}$",

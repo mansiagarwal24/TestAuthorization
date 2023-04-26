@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
@@ -7,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class CustomerDTO {
-    @Pattern(regexp = "^(.+)@(\\S+)$",message = "Email is not valid")
+    @Email(message = "Email is not valid")
     private String email;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,15}$",
@@ -15,7 +16,7 @@ public class CustomerDTO {
     private String password;
     private String confirmPassword;
 
-    @Min(10) @Max(10)
+    //@Min(10) @Max(10)
     private Long phoneNo;
     private String firstName;
     private String lastName;

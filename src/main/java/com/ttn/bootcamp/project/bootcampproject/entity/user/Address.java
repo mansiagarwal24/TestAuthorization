@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.usermodels;
+package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,9 +1,10 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.usermodels;
+package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,6 +25,6 @@ public class User {
     private Date passwordUpdateDate;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    private Set<Role> role;
+    private List<Role> role;
 
 }

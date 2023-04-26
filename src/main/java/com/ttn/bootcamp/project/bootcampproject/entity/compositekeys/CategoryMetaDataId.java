@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.compositekeys;
+package com.ttn.bootcamp.project.bootcampproject.entity.compositekeys;
 
 import jakarta.persistence.Embeddable;
 import lombok.Data;

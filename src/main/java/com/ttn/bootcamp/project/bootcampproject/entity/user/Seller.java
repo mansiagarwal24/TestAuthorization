@@ -1,12 +1,13 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.usermodels;
+package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.Data;
 
 @Entity
 @Data
-//@PrimaryKeyJoinColumn(name="userId")
+@PrimaryKeyJoinColumn(name="user_id")
 public class Seller extends User{
     private String gst;
     private Long companyContact;

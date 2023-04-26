@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject.globalexceptionhandler;
+package com.ttn.bootcamp.project.bootcampproject.exceptionhandler;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject.entities.productmodels;
+package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import jakarta.persistence.*;
 import lombok.Data;
