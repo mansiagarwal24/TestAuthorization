@@ -12,7 +12,7 @@ import java.util.List;
 //@PrimaryKeyJoinColumn(name="user_id")
 public class Customer extends User{
 
-    private Long contact;
+    private String contact;
 
     @OneToMany(mappedBy = "customer")
     private List<Address> addressList;

@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.dto;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -16,14 +17,14 @@ public class SellerDTO {
     private String password;
     private String confirmPassword;
 
-    @Column(unique=true)
-    private String gst;
+    private String gstNO;
 
     @Column(unique=true)
     private String companyName;
 
     private String companyAddress;
-    private Long companyContact;
+    @Size(max = 10,min = 10)
+    private String companyContact;
     private String firstName;
     private String lastName;
 }

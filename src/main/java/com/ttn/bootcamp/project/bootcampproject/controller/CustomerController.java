@@ -1,7 +1,10 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
+import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import com.ttn.bootcamp.project.bootcampproject.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,10 @@ public class CustomerController {
     CustomerService customerService;
     @Autowired
     CustomerRepo customerRepo;
+    @Autowired
+    JWTGenerator jwtGenerator;
+    @Autowired
+    UserRepo userRepo;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody CustomerDTO customerDTO){
@@ -28,8 +35,24 @@ public class CustomerController {
         customerService.createCustomer(customerDTO);
         return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
     }
+
     @PutMapping("/activate")
     public ResponseEntity<?> activateAccount(@RequestParam String token){
-     return new ResponseEntity<>("Account is activated",HttpStatus.OK);
+        boolean isActivate=customerService.activateCustomer(token);
+        if(isActivate==true){
+        return new ResponseEntity<>("Your Account has been activated",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Your token has expired or incorrect ",HttpStatus.BAD_REQUEST);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam String token){
+        boolean isvalid =customerService.logoutCustomer(token);
+        if(isvalid==true) {
+            return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("You are not logged in.",HttpStatus.BAD_REQUEST);
+    }
+
+
 }

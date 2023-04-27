@@ -1,9 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -16,8 +13,8 @@ public class CustomerDTO {
     private String password;
     private String confirmPassword;
 
-    //@Min(10) @Max(10)
-    private Long phoneNo;
+    @Size(min = 10,max = 10)
+    private String phoneNo;
     private String firstName;
     private String lastName;
 }

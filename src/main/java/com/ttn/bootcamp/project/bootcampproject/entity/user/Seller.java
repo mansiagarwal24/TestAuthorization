@@ -9,8 +9,8 @@ import lombok.Data;
 @Data
 @PrimaryKeyJoinColumn(name="user_id")
 public class Seller extends User{
-    private String gst;
-    private Long companyContact;
+    private String gstNo;
+    private String companyContact;
     private String companyName;
 
     @OneToOne(mappedBy = "seller")

@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -23,6 +24,7 @@ public class User {
     private boolean isDeleted=false,isActive=false,isExpired=false,isLocked = false;
     private int invalidAttemptCount;
     private Date passwordUpdateDate;
+    private String token;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     private List<Role> role;

@@ -15,7 +15,7 @@ public class JWTGenerator {
     public String generateToken(Authentication authentication){
         String username = authentication.getName();
         Date currentDate = new Date();
-        Date expirationDateTime = new Date(currentDate.getTime()+100000);
+        Date expirationDateTime = new Date(currentDate.getTime()+60*60*24*1000);
 
         String token = Jwts.builder()
                 .setSubject(username)
@@ -25,8 +25,20 @@ public class JWTGenerator {
                 .compact();
         return token;
     }
+    public String generateToken(String email){
+        Date currentDate = new Date();
+        Date expirationDateTime = new Date(currentDate.getTime()+100000);
 
-    public String getUserNameFromJWT(String token){
+        String token = Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(currentDate)
+                .setExpiration(expirationDateTime)
+                .signWith(SignatureAlgorithm.HS512,"privateKey")
+                .compact();
+        return token;
+    }
+
+    public String getEmailFromJWT(String token){
         Claims claims = Jwts.parser()
                 .setSigningKey("privateKey")
                 .parseClaimsJws(token)

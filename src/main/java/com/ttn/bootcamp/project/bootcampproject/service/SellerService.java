@@ -27,11 +27,11 @@ public class SellerService {
         seller.setCompanyContact(sellerDTO.getCompanyContact());
         seller.setCompanyName(sellerDTO.getCompanyName());
         //seller.setAddress(sellerDTO.getCompanyAddress());
-        seller.setGst(sellerDTO.getGst());
+        seller.setGstNo(sellerDTO.getGstNO());
 
         sellerRepo.save(seller);
 
-        emailService.sendMail(seller.getEmail(),jwtService.generateToken(seller.getEmail()));
+//        emailService.sendMail(seller.getEmail(),seller.getToken().toString());
 
     }
 

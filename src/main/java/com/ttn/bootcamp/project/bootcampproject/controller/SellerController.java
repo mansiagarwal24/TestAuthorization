@@ -27,6 +27,12 @@ public class SellerController {
         if(!sellerDTO.getPassword().equals(sellerDTO.getConfirmPassword())) {
             return new ResponseEntity<>("Password doesn't match.", HttpStatus.BAD_REQUEST);
         }
+        if(sellerRepo.existsByCompanyName(sellerDTO.getCompanyName())){
+            return new ResponseEntity<>("Company Name is already registered with other seller",HttpStatus.BAD_REQUEST);
+        }
+        if(sellerRepo.existsByGstNo(sellerDTO.getGstNO())){
+            return new ResponseEntity<>("GST Number is already registered",HttpStatus.BAD_REQUEST);
+        }
         sellerService.createSeller(sellerDTO);
         return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
     }
