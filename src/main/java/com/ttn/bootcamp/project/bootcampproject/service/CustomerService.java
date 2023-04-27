@@ -73,10 +73,23 @@ public class CustomerService {
 
     public boolean logoutCustomer(String token){
         Token validToken = tokenRepo.findByToken(token).get();
-        if(!validToken.getIsDeleted()){
-            validToken.setIsDeleted(true);
+        if(!validToken.getIsInvalid()){
+            validToken.setIsInvalid(true);
             return true;
         }
         return false;
     }
+
+    public boolean matches(String rawPassword, String encodedPassword){
+        int count=0;
+        if(rawPassword == encodedPassword){
+            return true;
+        }
+        if (count!=3){
+            return false;
+        }
+        return true;
+
+    }
+
 }

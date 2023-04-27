@@ -13,7 +13,7 @@ public class CustomerDTO {
     private String password;
     private String confirmPassword;
 
-    @Size(min = 10,max = 10)
+    @Size(min = 10,max = 10,message = "phone no is not valid,must contain 10 digits only")
     private String phoneNo;
     private String firstName;
     private String lastName;

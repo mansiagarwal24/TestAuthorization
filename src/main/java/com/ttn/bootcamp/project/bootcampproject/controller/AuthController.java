@@ -8,6 +8,7 @@ import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
+import com.ttn.bootcamp.project.bootcampproject.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,9 @@ public class AuthController {
     @Autowired
     TokenRepo tokenRepo;
     @Autowired
-    DaoAuthenticationProvider provider;
+    CustomerService customerService;
+    @Autowired
+    PasswordEncoder encoder;
 
 
     @PostMapping("/login")
@@ -47,15 +50,19 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtGenerator.generateToken(authentication);
         User user=userRepo.findByEmail(loginDTO.getEmail()).get();
-        int count = 0;
-        String password =provider.setPasswordEncoder();
-        if(isvalid==true){
-            count++;
+//        boolean isvalid = customerService.matches(loginDTO.getPassword(), user.getPassword());
+//        if(isvalid==false){
+//            return new ResponseEntity<>("Try Again,Wrong Credentials!!",HttpStatus.UNAUTHORIZED);
+//        }
+//        if(count==3){
+//            user.setLocked(true);
+//            return new ResponseEntity<>("Invalid Attempts!! \n your account has been Locked.",HttpStatus.UNAUTHORIZED);
+//        }
+        String password = String.valueOf(encoder.encode(loginDTO.getPassword()));
+        boolean isvalid =customerService.matches(password, loginDTO.getPassword());
+
+        if(isvalid==false){
             return new ResponseEntity<>("Try Again,Wrong Credentials!!",HttpStatus.UNAUTHORIZED);
-        }
-        if(count==3){
-            user.setLocked(true);
-            return new ResponseEntity<>("Invalid Attempts!! \n your account has been Locked.",HttpStatus.UNAUTHORIZED);
         }
          if(!user.isActive()){
              return new ResponseEntity<>("please activate your account",HttpStatus.BAD_REQUEST);
