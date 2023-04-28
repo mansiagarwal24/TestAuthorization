@@ -12,7 +12,7 @@ public class Token {
     private Long Id;
     private String email;
     private String token;
-    private Boolean isInvalid=Boolean.FALSE;
+    private boolean isDelete=false;
     @OneToOne(cascade = CascadeType.ALL)
     private User user;
 }

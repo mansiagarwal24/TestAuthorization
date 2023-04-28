@@ -12,14 +12,19 @@ import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTAuthenticationFilter;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
+import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class CustomerService {
     @Autowired
     CustomerRepo customerRepo;
@@ -52,44 +57,7 @@ public class CustomerService {
         String uuid = String.valueOf(UUID.randomUUID());
         customer.setToken(uuid);
         userRepo.save(customer);
-        emailService.sendMail(customerDTO.getEmail(),"Activation Code ","http://localhost:8080/customer/activate?token="+uuid);
-    }
-
-    public boolean activateCustomer(String token) {
-//        boolean res = jwtGenerator.validateToken(token);
-//        if (res = true) {
-//            String email = jwtGenerator.getEmailFromJWT(token);
-//            User user = userRepo.findByEmail(email).get();
-//            user.setActive(true);
-//            userRepo.save(user);
-//            return true;
-//        }
-//        return false;
-       User user = userRepo.findByToken(token).get();
-       user.setActive(true);
-       userRepo.save(user);
-       return true;
-    }
-
-    public boolean logoutCustomer(String token){
-        Token validToken = tokenRepo.findByToken(token).get();
-        if(!validToken.getIsInvalid()){
-            validToken.setIsInvalid(true);
-            return true;
-        }
-        return false;
-    }
-
-    public boolean matches(String rawPassword, String encodedPassword){
-        int count=0;
-        if(rawPassword == encodedPassword){
-            return true;
-        }
-        if (count!=3){
-            return false;
-        }
-        return true;
-
+        emailService.sendMail(customerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/customer/activate?token="+uuid);
     }
 
 }

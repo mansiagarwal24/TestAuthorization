@@ -11,7 +11,6 @@ public class EmailService {
     JavaMailSender javaMailSender;
 
 
-    private String link="http://localhost:8080/customer/activate?token=";
 
     public void sendMail(String toEmail, String subject,String body){
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();

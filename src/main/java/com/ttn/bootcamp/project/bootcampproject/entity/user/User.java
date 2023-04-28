@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.entity.user;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +24,7 @@ public class User {
     private String password;
     private boolean isDeleted=false,isActive=false,isExpired=false,isLocked = false;
     private int invalidAttemptCount;
-    private Date passwordUpdateDate;
+    private LocalDate passwordUpdateDate;
     private String token;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)

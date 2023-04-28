@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/customer/**","auth/**").permitAll()
+                .requestMatchers("/customer/**","user/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic();

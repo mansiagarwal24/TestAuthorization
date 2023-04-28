@@ -36,23 +36,7 @@ public class CustomerController {
         return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
     }
 
-    @PutMapping("/activate")
-    public ResponseEntity<?> activateAccount(@RequestParam String token){
-        boolean isActivate=customerService.activateCustomer(token);
-        if(isActivate==true){
-        return new ResponseEntity<>("Your Account has been activated",HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Your token has expired or incorrect ",HttpStatus.BAD_REQUEST);
-    }
 
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestParam String token){
-        boolean isvalid =customerService.logoutCustomer(token);
-        if(isvalid==true) {
-            return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("You are not logged in.",HttpStatus.BAD_REQUEST);
-    }
 
 
 }
