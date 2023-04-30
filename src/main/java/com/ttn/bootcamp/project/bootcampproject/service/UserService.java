@@ -2,6 +2,7 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ResetDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
@@ -73,22 +74,26 @@ public class UserService {
 
             return new ResponseEntity<>("Login Successfully. Your access token is : " + token, HttpStatus.OK);
         }
-        return new ResponseEntity<>("Invalid Email!!",HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("Invalid Email!!",HttpStatus.BAD_REQUEST);
     }
 
-    public boolean logout(String token){
+    public ResponseEntity<?> logout(String token){
         if(jwtGenerator.validateToken(token)) {
-            Token accesstoken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token is not found");});
-            if(accesstoken.isDelete()==true){
-                return false;
+            String email = jwtGenerator.getEmailFromJWT(token);
+            User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("Email doesn't exist!!");});
+            Token accesstoken = tokenRepo.findByToken(token).get();
+            if(user.getUserId()== accesstoken.getUser().getUserId()){
+                if (accesstoken.isDelete() == true) {
+                    return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
+                } else {
+                    accesstoken.setDelete(true);
+                    tokenRepo.save(accesstoken);
+                    return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
+                }
             }
-            else{
-                accesstoken.setDelete(true);
-                tokenRepo.save(accesstoken);
-                return true;
-            }
+            return new ResponseEntity<>("Invalid User!!", HttpStatus.BAD_REQUEST);
         }
-        return false;
+        return new ResponseEntity<>("Token is not valid or expire",HttpStatus.UNAUTHORIZED);
     }
 
     public boolean forgotPassword(String email){
@@ -101,18 +106,26 @@ public class UserService {
         return true;
     }
 
-    public boolean resetPassword(String resetPassword,String newToken){
-        String email = jwtGenerator.getEmailFromJWT(newToken);
-        User user = userRepo.findByEmail(email).get();
-        if(StringUtils.isBlank(resetPassword)){
-            return false;
+    public ResponseEntity<?> resetPassword(ResetDTO resetDTO){
+        if(jwtGenerator.validateToken(resetDTO.getAccessToken())) {
+            String email = jwtGenerator.getEmailFromJWT(resetDTO.getAccessToken());
+            User user = userRepo.findByEmail(email).get();
+            if (StringUtils.isBlank(resetDTO.getPassword())) {
+                return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
+            }
+            if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
+                return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
+            } else {
+                User newUser = new User();
+                user.setPassword(encoder.encode(resetDTO.getPassword()));
+                LocalDate date = LocalDate.now();
+                user.setPasswordUpdateDate(date);
+                userRepo.save(user);
+                return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
+            }
         }
-        CustomerDTO customerDTO = new CustomerDTO();
-        user.setPassword(encoder.encode(customerDTO.getPassword()));
-        LocalDate date = LocalDate.now();
-        user.setPasswordUpdateDate(date);
-        userRepo.save(user);
-        return true;
+        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.UNAUTHORIZED);
+
     }
 
     public boolean activate(String token) {

@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.controller;
 import com.ttn.bootcamp.project.bootcampproject.dto.SellerDTO;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class SellerController {
     SellerRepo sellerRepo;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody SellerDTO sellerDTO){
+    public ResponseEntity<?> register(@RequestBody @Valid SellerDTO sellerDTO){
         if(sellerRepo.existsByEmail(sellerDTO.getEmail())){
             return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);
         }

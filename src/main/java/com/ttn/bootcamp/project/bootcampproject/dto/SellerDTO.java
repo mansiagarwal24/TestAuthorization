@@ -19,7 +19,6 @@ public class SellerDTO {
 
     private String gstNO;
 
-    @Column(unique=true)
     private String companyName;
 
     private String companyAddress;

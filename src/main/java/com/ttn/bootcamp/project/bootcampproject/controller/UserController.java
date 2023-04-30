@@ -1,23 +1,12 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
-import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
-import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
-import com.ttn.bootcamp.project.bootcampproject.service.CustomerService;
+import com.ttn.bootcamp.project.bootcampproject.dto.ResetDTO;
 import com.ttn.bootcamp.project.bootcampproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,7 +17,6 @@ public class UserController {
 
     @Autowired
     UserService userService;
-
 
 
     @PostMapping("/login")
@@ -55,20 +43,14 @@ public class UserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestParam String token,@RequestBody String password){
-        boolean isPassowordSet =userService.resetPassword(token,password);
-        if(isPassowordSet==true){
-            return  new ResponseEntity<>("Password set successfully!!",HttpStatus.OK);
-        }
-        return  new ResponseEntity<>("Password cannot be empty!!",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> resetPassword(@RequestBody ResetDTO resetDTO){
+        return userService.resetPassword(resetDTO);
+
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestParam String token){
-        boolean isvalid = userService.logout(token);
-        if(isvalid==true) {
-            return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("You are not logged in.",HttpStatus.BAD_REQUEST);
+        return userService.logout(token);
     }
+
 }

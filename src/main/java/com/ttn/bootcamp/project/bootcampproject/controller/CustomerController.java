@@ -35,8 +35,4 @@ public class CustomerController {
         customerService.createCustomer(customerDTO);
         return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
     }
-
-
-
-
 }

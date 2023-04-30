@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -57,7 +58,8 @@ public class CustomerService {
         String uuid = String.valueOf(UUID.randomUUID());
         customer.setToken(uuid);
         userRepo.save(customer);
-        emailService.sendMail(customerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/customer/activate?token="+uuid);
+        emailService.sendMail(customerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
     }
+
 
 }

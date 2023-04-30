@@ -14,8 +14,8 @@ import java.util.UUID;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name="userid",sequenceName ="user",initialValue = 1,allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userid")
+    @SequenceGenerator(name="userid",sequenceName ="user_seq",allocationSize = 1)
     private Long userId;
     private String email;
     private String firstName;
