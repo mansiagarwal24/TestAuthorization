@@ -9,6 +9,8 @@ import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -52,5 +54,16 @@ public class SellerService {
         emailService.sendMail(sellerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
 
     }
+
+
+//    public ResponseEntity<?> viewProfile(String token){
+//        if(jwtService.validateToken(token)){
+//            String email = jwtService.getEmailFromJWT(token);
+//            Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("Email doesn't exist");});
+//            sellerRepo.getAll(seller);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
+//    }
 
 }

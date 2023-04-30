@@ -35,4 +35,10 @@ public class CustomerController {
         customerService.createCustomer(customerDTO);
         return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
     }
+
+
+    @GetMapping("/viewProfile")
+    public ResponseEntity<?> findOne(@RequestParam String token){
+        return customerService.viewProfile(token);
+    }
 }
