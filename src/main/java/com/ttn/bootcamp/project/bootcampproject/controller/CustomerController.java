@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
@@ -38,7 +39,7 @@ public class CustomerController {
 
 
     @GetMapping("/viewProfile")
-    public ResponseEntity<?> findOne(@RequestParam String token){
-        return customerService.viewProfile(token);
+    public ResponseEntity<?> findOne(@RequestParam String token, CustomerResponseDTO customerResponseDTO){
+        return customerService.viewProfile(token,customerResponseDTO);
     }
 }

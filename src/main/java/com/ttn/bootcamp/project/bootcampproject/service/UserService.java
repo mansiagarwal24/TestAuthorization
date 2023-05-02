@@ -1,9 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.ResetDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.ResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
 import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
@@ -79,19 +77,19 @@ public class UserService {
 
     public ResponseEntity<?> logout(String token){
         if(jwtGenerator.validateToken(token)) {
-            String email = jwtGenerator.getEmailFromJWT(token);
-            User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("Email doesn't exist!!");});
+            String email =jwtGenerator.getEmailFromJWT(token);
+            User user = userRepo.findByEmail(email).orElseThrow(() -> {
+                throw new RuntimeException("User doesn't exist!!");
+            });
             Token accesstoken = tokenRepo.findByToken(token).get();
-            if(user.getUserId()== accesstoken.getUser().getUserId()){
-                if (accesstoken.isDelete() == true) {
-                    return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
-                } else {
-                    accesstoken.setDelete(true);
-                    tokenRepo.save(accesstoken);
-                    return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
-                }
+            if (accesstoken.isDelete() == true) {
+                return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
+            } else {
+                accesstoken.setDelete(true);
+                tokenRepo.save(accesstoken);
+                return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
             }
-            return new ResponseEntity<>("Invalid User!!", HttpStatus.BAD_REQUEST);
+
         }
         return new ResponseEntity<>("Token is not valid or expire",HttpStatus.UNAUTHORIZED);
     }
@@ -106,17 +104,16 @@ public class UserService {
         return true;
     }
 
-    public ResponseEntity<?> resetPassword(ResetDTO resetDTO){
-        if(jwtGenerator.validateToken(resetDTO.getAccessToken())) {
-            String email = jwtGenerator.getEmailFromJWT(resetDTO.getAccessToken());
-            User user = userRepo.findByEmail(email).get();
+    public ResponseEntity<?> resetPassword(String token, ResetPasswordDTO resetDTO){
+        if(jwtGenerator.validateToken(token)) {
+            String email = jwtGenerator.getEmailFromJWT(token);
+            User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
             if (StringUtils.isBlank(resetDTO.getPassword())) {
                 return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
             }
             if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
                 return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
             } else {
-                User newUser = new User();
                 user.setPassword(encoder.encode(resetDTO.getPassword()));
                 LocalDate date = LocalDate.now();
                 user.setPasswordUpdateDate(date);

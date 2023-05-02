@@ -44,7 +44,6 @@ public class JWTGenerator {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
-
     }
 
     public boolean validateToken(String token){

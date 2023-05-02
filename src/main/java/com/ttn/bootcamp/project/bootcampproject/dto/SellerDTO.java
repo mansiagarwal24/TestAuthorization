@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Address;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -26,4 +27,10 @@ public class SellerDTO {
     private String companyContact;
     private String firstName;
     private String lastName;
+    private String city;
+    private String state;
+    private String country;
+    private String addressLine;
+    private int zipCode;
+    private String label;
 }

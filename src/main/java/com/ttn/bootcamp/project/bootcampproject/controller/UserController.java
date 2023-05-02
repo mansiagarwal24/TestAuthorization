@@ -1,7 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.ResetDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email){
+    public ResponseEntity<?> forgotPassword(@RequestParam String email,@RequestParam Long id){
         boolean isValid = userService.forgotPassword(email);
         if(isValid==true){
             return  new ResponseEntity<>("Reset Password email sent successfully!!",HttpStatus.OK);
@@ -43,9 +43,8 @@ public class UserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetDTO resetDTO){
-        return userService.resetPassword(resetDTO);
-
+    public ResponseEntity<?> resetPassword(@RequestParam String token,@RequestBody ResetPasswordDTO resetDTO){
+        return userService.resetPassword(token,resetDTO);
     }
 
     @PostMapping("/logout")

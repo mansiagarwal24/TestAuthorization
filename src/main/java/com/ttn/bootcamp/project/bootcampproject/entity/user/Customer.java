@@ -1,8 +1,8 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.Data;
 
 import java.util.List;
@@ -14,6 +14,6 @@ public class Customer extends User{
 
     private String contact;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
     private List<Address> addressList;
 }

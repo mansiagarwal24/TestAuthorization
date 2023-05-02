@@ -34,9 +34,9 @@ public class AdminService {
 
     public ResponseEntity<List<CustomerResponseDTO>> findAllCustomer(int pageOffSet,int pageSize,String sortBy) {
         PageRequest page = PageRequest.of(pageOffSet,pageSize, Sort.Direction.ASC,sortBy);
-        Page<Customer> customers = customerRepo.findAll(page);
+        Page<Customer> customersPages = customerRepo.findAll(page);
         List<CustomerResponseDTO> customerList=new ArrayList<>();
-        for(Customer customer:customers) {
+        for(Customer customer:customersPages) {
             CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
             customerResponseDTO.setId(customer.getUserId());
             customerResponseDTO.setEmail(customer.getEmail());

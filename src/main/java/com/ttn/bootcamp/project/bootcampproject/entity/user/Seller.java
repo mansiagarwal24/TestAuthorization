@@ -1,5 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrimaryKeyJoinColumn;
@@ -13,6 +15,7 @@ public class Seller extends User{
     private String companyContact;
     private String companyName;
 
-    @OneToOne(mappedBy = "seller")
+    @JsonIgnore
+    @OneToOne(mappedBy = "seller",cascade = CascadeType.ALL)
     private Address address;
 }

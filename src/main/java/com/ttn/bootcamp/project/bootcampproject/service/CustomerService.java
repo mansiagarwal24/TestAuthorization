@@ -1,6 +1,8 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
@@ -57,19 +59,54 @@ public class CustomerService {
         String uuid = String.valueOf(UUID.randomUUID());
         customer.setToken(uuid);
         userRepo.save(customer);
-        emailService.sendMail(customerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
+        emailService.sendMail(customerDTO.getEmail(), "Activation Code ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + uuid);
     }
 
-    public ResponseEntity<?> viewProfile(String token){
-        if(jwtService.validateToken(token)){
+    public ResponseEntity<?> viewProfile(String token, CustomerResponseDTO customerResponseDTO) {
+        if (jwtService.validateToken(token)) {
             String email = jwtService.getEmailFromJWT(token);
-            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("Email doesn't exist");});
-//            customerRepo.getAll(customer);
+            Customer customer = customerRepo.findByEmail(email).orElseThrow(() -> {
+                throw new RuntimeException("User doesn't exist");
+            });
+//
+            customerResponseDTO.setLastName((customer.getLastName()));
+            customerResponseDTO.setFirstName(customer.getFirstName());
+            customerResponseDTO.setEmail(customer.getEmail());
 
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
     }
-
-
+//
+//    public ResponseEntity<?> updateProfile(String token, SellerUpdateDTO sellerUpdateDTO) {
+//        if(jwtService.validateToken(token)){
+//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+//            if(accessToken.isDelete()==true){
+//                return new ResponseEntity<>("Token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+//            }
+//            String email  = jwtService.getEmailFromJWT(token);
+//            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+//
+//            if(sellerUpdateDTO.getFirstName()!=null){
+//                seller.setFirstName(sellerUpdateDTO.getFirstName());
+//            }
+//            if(sellerUpdateDTO.getLastName()!=null){
+//                seller.setLastName(sellerUpdateDTO.getLastName());
+//            }
+//            if(sellerUpdateDTO.getCompanyContact()!=null){
+//                seller.setCompanyContact(sellerUpdateDTO.getCompanyContact());
+//            }
+//            if(sellerUpdateDTO.getMiddleName()!=null){
+//                seller.setMiddleName(sellerUpdateDTO.getMiddleName());
+//            }
+//            if(sellerUpdateDTO.getCompanyName()!=null){
+//                seller.setCompanyName(sellerUpdateDTO.getCompanyName());
+//            }
+//            sellerRepo.save(seller);
+//
+//            return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
+//
+//        }
+//        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.BAD_REQUEST);
+//    }
 }

@@ -1,6 +1,9 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
+import com.ttn.bootcamp.project.bootcampproject.dto.AddressDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.SellerDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
 import jakarta.validation.Valid;
@@ -39,4 +42,19 @@ public class SellerController {
 //    public ResponseEntity<?> findOne(@RequestParam String token){
 //        return sellerService.viewProfile(token);
 //    }
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<?> updateSellerProfile(@RequestParam String token,@RequestBody SellerUpdateDTO sellerUpdateDTO){
+        return sellerService.updateProfile(token,sellerUpdateDTO);
+    }
+
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<?> updateSellerPassword(@RequestParam String token, @RequestBody ResetPasswordDTO resetPasswordDTO){
+        return sellerService.updatePassword(token,resetPasswordDTO);
+    }
+
+    @PatchMapping("/updateAddress")
+    public ResponseEntity<?> updateSellerAddress(@RequestParam String token, @RequestBody AddressDTO addressDTO){
+        return sellerService.updateAddress(token,addressDTO);
+    }
 }
