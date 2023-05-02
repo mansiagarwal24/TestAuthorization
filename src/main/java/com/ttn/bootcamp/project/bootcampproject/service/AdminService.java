@@ -1,6 +1,8 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.SellerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
@@ -8,10 +10,14 @@ import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -26,15 +32,42 @@ public class AdminService {
     EmailService emailService;
 
 
-    public List<Customer> findAllCustomers() {
-        List<Customer> users = customerRepo.findAll();
-        return users;
+    public ResponseEntity<List<CustomerResponseDTO>> findAllCustomer(int pageOffSet,int pageSize,String sortBy) {
+        PageRequest page = PageRequest.of(pageOffSet,pageSize, Sort.Direction.ASC,sortBy);
+        Page<Customer> customers = customerRepo.findAll(page);
+        List<CustomerResponseDTO> customerList=new ArrayList<>();
+        for(Customer customer:customers) {
+            CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
+            customerResponseDTO.setId(customer.getUserId());
+            customerResponseDTO.setEmail(customer.getEmail());
+            customerResponseDTO.setActive(customer.isActive());
+            customerResponseDTO.setFirstName(customer.getFirstName());
+            customerResponseDTO.setLastName(customer.getLastName());
+            customerList.add(customerResponseDTO);
+        }
+        return new ResponseEntity<>(customerList,HttpStatus.OK);
     }
 
-    public List<Seller> findAllSellers() {
-        List<Seller> users = sellerRepo.findAll();
-        return users;
+    public ResponseEntity<List<SellerResponseDTO>> findAllSeller(int pageOffSet, int pageSize, String sortBy) {
+        PageRequest page = PageRequest.of(pageOffSet,pageSize, Sort.Direction.ASC,sortBy);
+        Page<Seller> sellersPage = sellerRepo.findAll(page);
+        List<SellerResponseDTO> sellerList=new ArrayList<>();
+        for(Seller seller:sellersPage) {
+            SellerResponseDTO sellerResponseDTO = new SellerResponseDTO();
+            sellerResponseDTO.setId(seller.getUserId());
+            sellerResponseDTO.setEmail(seller.getEmail());
+            sellerResponseDTO.setActive(seller.isActive());
+            sellerResponseDTO.setFirstName(seller.getFirstName());
+            sellerResponseDTO.setLastName(seller.getLastName());
+            sellerResponseDTO.setCompanyName(seller.getCompanyName());
+            sellerResponseDTO.setCompanyContact(seller.getCompanyContact());
+            sellerResponseDTO.setCompanyAddress(seller.getAddress());
+            sellerList.add(sellerResponseDTO);
+        }
+        return new ResponseEntity<>(sellerList,HttpStatus.OK);
     }
+
+
 
     public ResponseEntity<?> activateUser(Long id) {
         if(userRepo.existsById(id)){

@@ -27,7 +27,7 @@ public class User {
     private LocalDate passwordUpdateDate;
     private String token;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> role;
 
 }

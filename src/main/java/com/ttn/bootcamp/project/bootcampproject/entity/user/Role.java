@@ -17,9 +17,6 @@ public class Role{
     private Long id;
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
     @ManyToMany
     private List<User> user;
-
-
 }

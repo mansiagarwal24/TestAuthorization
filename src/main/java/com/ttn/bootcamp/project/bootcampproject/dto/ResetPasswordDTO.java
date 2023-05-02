@@ -10,4 +10,5 @@ public class ResetDTO {
     private String password;
     private String confirmPassword;
     private String accessToken;
+    private String email;
 }

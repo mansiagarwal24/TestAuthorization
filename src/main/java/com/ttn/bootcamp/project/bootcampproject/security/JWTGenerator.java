@@ -55,6 +55,4 @@ public class JWTGenerator {
             throw new AuthenticationCredentialsNotFoundException("Token has Expired or Incorrect");
         }
     }
-
-
 }

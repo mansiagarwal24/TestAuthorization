@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface SellerRepo extends JpaRepository<Seller,Long> {
 //    Optional<Seller> findByEmail(String email);
-//    Seller getAll(Seller seller);
+
     Boolean existsByEmail(String email);
     Boolean existsByCompanyName(String companyName);
     Boolean existsByGstNo(String gstNo);
-    List<Seller> findAll();
+
 
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class CustomerDTO {
     @Email(message = "Email is not valid")
+    @NotBlank
     private String email;
 
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,15}$",
@@ -13,6 +14,8 @@ public class CustomerDTO {
     private String password;
     private String confirmPassword;
 
+
+    @Pattern(regexp = "^(?=.*[0-9])")
     @Size(min = 10,max = 10,message = "phone no is not valid,must contain 10 digits only")
     private String phoneNo;
     private String firstName;

@@ -15,19 +15,16 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     @Autowired
     AdminService adminService;
-    @Autowired
-    CustomerRepo customerRepo;
-    @Autowired
-    UserRepo userRepo;
-    @GetMapping("/customers")
-    public ResponseEntity<?> getCustomer(){
-        return new ResponseEntity<>(adminService.findAllCustomers(), HttpStatus.OK);
 
+
+    @GetMapping("/customers")
+    public ResponseEntity<?> getCustomer(@RequestParam int pageOffSet,@RequestParam int pageSize,@RequestParam String sort){
+        return adminService.findAllCustomer(pageOffSet,pageSize,sort);
     }
 
     @GetMapping("/sellers")
-    public ResponseEntity<?> getSeller(){
-        return new ResponseEntity<>(adminService.findAllSellers(), HttpStatus.OK);
+    public ResponseEntity<?> getSeller(@RequestParam(defaultValue = "10",required = false) int pageOffSet,@RequestParam int pageSize,@RequestParam String sort){
+        return adminService.findAllSeller(pageOffSet,pageSize,sort);
 
     }
 
