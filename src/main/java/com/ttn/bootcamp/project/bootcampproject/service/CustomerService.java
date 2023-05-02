@@ -1,14 +1,9 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
-import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.*;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTAuthenticationFilter;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import io.micrometer.common.util.StringUtils;
@@ -23,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -30,6 +26,8 @@ import java.util.UUID;
 public class CustomerService {
     @Autowired
     CustomerRepo customerRepo;
+    @Autowired
+    AddressRepo addressRepo;
     @Autowired
     UserRepo userRepo;
     @Autowired
@@ -77,36 +75,87 @@ public class CustomerService {
         }
         return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
     }
-//
-//    public ResponseEntity<?> updateProfile(String token, SellerUpdateDTO sellerUpdateDTO) {
-//        if(jwtService.validateToken(token)){
-//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-//            if(accessToken.isDelete()==true){
-//                return new ResponseEntity<>("Token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-//            }
-//            String email  = jwtService.getEmailFromJWT(token);
-//            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
-//
-//            if(sellerUpdateDTO.getFirstName()!=null){
-//                seller.setFirstName(sellerUpdateDTO.getFirstName());
-//            }
-//            if(sellerUpdateDTO.getLastName()!=null){
-//                seller.setLastName(sellerUpdateDTO.getLastName());
-//            }
-//            if(sellerUpdateDTO.getCompanyContact()!=null){
-//                seller.setCompanyContact(sellerUpdateDTO.getCompanyContact());
-//            }
-//            if(sellerUpdateDTO.getMiddleName()!=null){
-//                seller.setMiddleName(sellerUpdateDTO.getMiddleName());
-//            }
-//            if(sellerUpdateDTO.getCompanyName()!=null){
-//                seller.setCompanyName(sellerUpdateDTO.getCompanyName());
-//            }
-//            sellerRepo.save(seller);
-//
-//            return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
-//
-//        }
-//        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.BAD_REQUEST);
-//    }
+
+    public ResponseEntity<?> updateProfile(String token, CustomerUpdateDTO customerUpdateDTO) {
+        if(jwtService.validateToken(token)){
+            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+            if(accessToken.isDelete()==true){
+                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+            }
+            String email  = jwtService.getEmailFromJWT(token);
+            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+
+            if(customerUpdateDTO.getFirstName()!=null){
+                customer.setFirstName(customerUpdateDTO.getFirstName());
+            }
+            if(customerUpdateDTO.getLastName()!=null){
+                customer.setLastName(customerUpdateDTO.getLastName());
+            }
+            if(customerUpdateDTO.getContactNo()!=null){
+                customer.setContact(customerUpdateDTO.getContactNo());
+            }
+            if(customerUpdateDTO.getMiddleName()!=null){
+                customer.setMiddleName(customerUpdateDTO.getMiddleName());
+            }
+
+            customerRepo.save(customer);
+
+            return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> updatePassword(String token, ResetPasswordDTO resetPasswordDTO){
+        if(jwtService.validateToken(token)){
+            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+            if(accessToken.isDelete()==true){
+                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+            }
+            String email = jwtService.getEmailFromJWT(token);
+            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
+            if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
+                customer.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
+                customerRepo.save(customer);
+                emailService.sendMail(customer.getEmail(), "Password Reset","Your password has been updated successfully");
+
+                return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Password should be match",HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>("Token is not valid or expire",HttpStatus.BAD_REQUEST);
+    }
+
+    public ResponseEntity<?> updateAddress(String token, AddressDTO addressDTO){
+        if(jwtService.validateToken(token)){
+            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+            if(accessToken.isDelete()==true){
+                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+            }
+            String email = jwtService.getEmailFromJWT(token);
+            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist");});
+            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
+
+            if(addressDTO.getCity()!=null){
+                address.setCity(addressDTO.getCity());
+            }
+            if(addressDTO.getAddressLine()!=null){
+                address.setAddressLine(addressDTO.getAddressLine());
+            }
+            if(addressDTO.getCountry()!=null){
+                address.setCountry(addressDTO.getCountry());
+            }
+            if(addressDTO.getState()!=null){
+                address.setState(addressDTO.getState());
+            }
+            if(addressDTO.getZipCode()!=0){
+                address.setZipCode(addressDTO.getZipCode());
+            }
+            if(addressDTO.getLabel()!=null){
+                address.setLabel(addressDTO.getLabel());
+            }
+            addressRepo.save(address);
+            return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Token is invalid or expire!!",HttpStatus.BAD_REQUEST);
+    }
 }

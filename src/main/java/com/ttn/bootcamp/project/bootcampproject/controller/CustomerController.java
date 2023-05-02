@@ -1,7 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
@@ -39,7 +38,22 @@ public class CustomerController {
 
 
     @GetMapping("/viewProfile")
-    public ResponseEntity<?> findOne(@RequestParam String token, CustomerResponseDTO customerResponseDTO){
+    public ResponseEntity<?> viewProfile(@RequestParam String token, CustomerResponseDTO customerResponseDTO){
         return customerService.viewProfile(token,customerResponseDTO);
+    }
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<?> updateCustomerProfile(@RequestParam String token, CustomerUpdateDTO customerUpdateDTO){
+        return customerService.updateProfile(token,customerUpdateDTO);
+    }
+
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<?> updateCustomerPassword(@RequestParam String token, ResetPasswordDTO resetPasswordDTO){
+        return customerService.updatePassword(token,resetPasswordDTO);
+    }
+
+    @PatchMapping("/updateAddress")
+    public ResponseEntity<?> updateCustomerAddress(@RequestParam String token, AddressDTO addressDTO){
+        return customerService.updateAddress(token,addressDTO);
     }
 }
