@@ -26,20 +26,12 @@ public class UserController {
 
     @PutMapping("/activate")
     public ResponseEntity<?> activateAccount(@RequestParam String token){
-        boolean isActivate=userService.activate(token);
-        if(isActivate==true){
-            return new ResponseEntity<>("Your Account has been activated",HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Your token has expired or incorrect ",HttpStatus.BAD_REQUEST);
+        return userService.activate(token);
     }
 
     @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestParam String email,@RequestParam Long id){
-        boolean isValid = userService.forgotPassword(email);
-        if(isValid==true){
-            return  new ResponseEntity<>("Reset Password email sent successfully!!",HttpStatus.OK);
-        }
-        return  new ResponseEntity<>("Email doesn't exist!!",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> forgotPassword(@RequestParam String email){
+        return userService.forgotPassword(email);
     }
 
     @PutMapping("/resetPassword")

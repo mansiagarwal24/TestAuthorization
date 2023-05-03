@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -45,6 +46,7 @@ public class CustomerService {
     @Autowired
     TokenRepo tokenRepo;
 
+
     public void createCustomer(CustomerDTO customerDTO) {
         Customer customer = new Customer();
         customer.setEmail(customerDTO.getEmail());
@@ -52,11 +54,24 @@ public class CustomerService {
         customer.setLastName(customerDTO.getLastName());
         customer.setPassword(encoder.encode(customerDTO.getPassword()));
         customer.setContact(customerDTO.getPhoneNo());
+
+        Address address =new Address();
+        address.setCity(customerDTO.getCity());
+        address.setAddressLine(customerDTO.getAddressLine());
+        address.setLabel(customerDTO.getLabel());
+        address.setCountry(customerDTO.getCountry());
+        address.setZipCode(customerDTO.getZipCode());
+        address.setState(customerDTO.getState());
+        address.setCustomer(customer);
+
+
         Role role = roleRepo.findByAuthority(Authority.CUSTOMER).orElse(null);
         customer.setRole(Collections.singletonList(role));
         String uuid = String.valueOf(UUID.randomUUID());
         customer.setToken(uuid);
+
         userRepo.save(customer);
+        addressRepo.save(address);
         emailService.sendMail(customerDTO.getEmail(), "Activation Code ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + uuid);
     }
 
@@ -66,7 +81,7 @@ public class CustomerService {
             Customer customer = customerRepo.findByEmail(email).orElseThrow(() -> {
                 throw new RuntimeException("User doesn't exist");
             });
-//
+
             customerResponseDTO.setLastName((customer.getLastName()));
             customerResponseDTO.setFirstName(customer.getFirstName());
             customerResponseDTO.setEmail(customer.getEmail());
@@ -158,4 +173,20 @@ public class CustomerService {
         }
         return new ResponseEntity<>("Token is invalid or expire!!",HttpStatus.BAD_REQUEST);
     }
+
+    public ResponseEntity<?> viewAddress(String token){
+        if(jwtService.validateToken(token)){
+            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+            if(accessToken.isDelete()==true){
+                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+            }
+            String email= jwtGenerator.getEmailFromJWT(token);
+            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
+            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
+
+            return new ResponseEntity<>(address,HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Token is not valid or incorrect",HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,7 @@ public class User {
     private int invalidAttemptCount;
     private LocalDate passwordUpdateDate;
     private String token;
+    private LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> role;

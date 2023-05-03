@@ -20,4 +20,10 @@ public class CustomerDTO {
     private String phoneNo;
     private String firstName;
     private String lastName;
+    private String city;
+    private String state;
+    private String country;
+    private String addressLine;
+    private int zipCode;
+    private String label;
 }

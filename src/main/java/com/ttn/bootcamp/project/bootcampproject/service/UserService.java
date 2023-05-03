@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -89,19 +90,18 @@ public class UserService {
                 tokenRepo.save(accesstoken);
                 return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
             }
-
         }
         return new ResponseEntity<>("Token is not valid or expire",HttpStatus.UNAUTHORIZED);
     }
 
-    public boolean forgotPassword(String email){
-        User user = userRepo.findByEmail(email).get();
-        if(user == null) {
-            return false;
+    public ResponseEntity<?> forgotPassword(String email){
+        if(userRepo.existsByEmail(email)){
+            String token = jwtGenerator.generateToken(email);
+            emailService.sendMail(email,"Reset Password Link","Please use this link to reset your password again: "+"\n http://localhost:8080/user/resetPassword?token="+token);
+            return new ResponseEntity<>("Reset password link sent successfully ",HttpStatus.OK);
         }
-        String token = jwtGenerator.generateToken(email);
-        emailService.sendMail(email,"Reset Password Link","Please use this link to reset your password again: "+"\n http://localhost:8080/user/resetPassword?token="+token);
-        return true;
+        return new ResponseEntity<>("User not found",HttpStatus.BAD_REQUEST);
+
     }
 
     public ResponseEntity<?> resetPassword(String token, ResetPasswordDTO resetDTO){
@@ -125,14 +125,17 @@ public class UserService {
 
     }
 
-    public boolean activate(String token) {
-        User user = userRepo.findByToken(token).get();
+    public ResponseEntity<?> activate(String token) {
+        User user =userRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Invalid Token!!");});
+        if(user.getExpiryTime()==LocalDateTime.now()){
+            return new ResponseEntity<>("your token is expired!! please go to resend email activation link!!",HttpStatus.BAD_REQUEST);
+        }
         if(user==null){
-            return false;
+            return new ResponseEntity<>("User not found",HttpStatus.BAD_REQUEST);
         }
         user.setActive(true);
         userRepo.save(user);
-        return true;
+        return new ResponseEntity<>("Your account has been activated",HttpStatus.OK);
     }
 }
 

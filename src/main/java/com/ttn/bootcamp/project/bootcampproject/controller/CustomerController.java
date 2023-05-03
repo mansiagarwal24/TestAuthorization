@@ -47,6 +47,11 @@ public class CustomerController {
         return customerService.updateProfile(token,customerUpdateDTO);
     }
 
+    @GetMapping("/viewAddress")
+    public ResponseEntity<?> viewCustomerAddress(@RequestParam String token){
+        return customerService.viewAddress(token);
+    }
+
     @PatchMapping("/updatePassword")
     public ResponseEntity<?> updateCustomerPassword(@RequestParam String token, ResetPasswordDTO resetPasswordDTO){
         return customerService.updatePassword(token,resetPasswordDTO);

@@ -7,10 +7,12 @@ import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Address;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Role;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
 import com.ttn.bootcamp.project.bootcampproject.repository.AddressRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,8 @@ public class SellerService {
     RoleRepo roleRepo;
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    TokenRepo tokenRepo;
 
 
     public void createSeller(SellerDTO sellerDTO){
@@ -82,6 +86,10 @@ public class SellerService {
 
     public ResponseEntity<?> updateProfile(String token,SellerUpdateDTO sellerUpdateDTO) {
         if(jwtService.validateToken(token)){
+            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+            if(accessToken.isDelete()==true){
+                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+            }
             String email  = jwtService.getEmailFromJWT(token);
             Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
 
@@ -119,7 +127,7 @@ public class SellerService {
 
                 return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
             }
-            return new ResponseEntity<>("Password should be match",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>("Token is not valid or expire",HttpStatus.BAD_REQUEST);
     }
