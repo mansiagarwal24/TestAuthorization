@@ -61,6 +61,7 @@ public class UserService {
             }
             return new ResponseEntity<>("Incorrect Password!! please try again.",HttpStatus.UNAUTHORIZED);
         }
+
         if(authentication.isAuthenticated()){
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtGenerator.generateToken(authentication);
@@ -76,22 +77,19 @@ public class UserService {
         return new ResponseEntity<>("Invalid Email!!",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> logout(String token){
-        if(jwtGenerator.validateToken(token)) {
-            String email =jwtGenerator.getEmailFromJWT(token);
-            User user = userRepo.findByEmail(email).orElseThrow(() -> {
-                throw new RuntimeException("User doesn't exist!!");
-            });
-            Token accesstoken = tokenRepo.findByToken(token).get();
-            if (accesstoken.isDelete() == true) {
-                return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
-            } else {
-                accesstoken.setDelete(true);
-                tokenRepo.save(accesstoken);
-                return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
-            }
+    public ResponseEntity<?> logout(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepo.findByEmail(email).orElseThrow(() -> {
+            throw new RuntimeException("User doesn't exist!!");
+        });
+        Token accesstoken = tokenRepo.findByEmail(email).get();
+        if (accesstoken.isDelete() == true) {
+            return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
+        } else {
+            accesstoken.setDelete(true);
+            tokenRepo.save(accesstoken);
+            return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
         }
-        return new ResponseEntity<>("Token is not valid or expire",HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<?> forgotPassword(String email){
@@ -104,25 +102,21 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> resetPassword(String token, ResetPasswordDTO resetDTO){
-        if(jwtGenerator.validateToken(token)) {
-            String email = jwtGenerator.getEmailFromJWT(token);
-            User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
-            if (StringUtils.isBlank(resetDTO.getPassword())) {
-                return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
-            }
-            if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
-                return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
-            } else {
-                user.setPassword(encoder.encode(resetDTO.getPassword()));
-                LocalDate date = LocalDate.now();
-                user.setPasswordUpdateDate(date);
-                userRepo.save(user);
-                return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
-            }
+    public ResponseEntity<?> resetPassword( ResetPasswordDTO resetDTO){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        if (StringUtils.isBlank(resetDTO.getPassword())) {
+            return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.UNAUTHORIZED);
-
+        if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
+            return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
+        } else {
+            user.setPassword(encoder.encode(resetDTO.getPassword()));
+            LocalDate date = LocalDate.now();
+            user.setPasswordUpdateDate(date);
+            userRepo.save(user);
+            return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
+        }
     }
 
     public ResponseEntity<?> activate(String token) {

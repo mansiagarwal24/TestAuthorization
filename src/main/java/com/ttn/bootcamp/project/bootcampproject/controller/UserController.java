@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PutMapping("/activate")
-    public ResponseEntity<?> activateAccount(@RequestParam String token){
+    public ResponseEntity<?> activateAccount(@RequestHeader String token){
         return userService.activate(token);
     }
 
@@ -35,13 +35,13 @@ public class UserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestParam String token,@RequestBody ResetPasswordDTO resetDTO){
-        return userService.resetPassword(token,resetDTO);
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDTO resetDTO){
+        return userService.resetPassword(resetDTO);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestParam String token){
-        return userService.logout(token);
+    public ResponseEntity<?> logout(){
+        return userService.logout();
     }
 
 }

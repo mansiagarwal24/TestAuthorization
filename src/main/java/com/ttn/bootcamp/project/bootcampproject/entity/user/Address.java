@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class Address {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name="userid",sequenceName ="address",initialValue = 1,allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "addressid")
+    @SequenceGenerator(name="addressid",sequenceName ="address",allocationSize = 1)
     private Long id;
     private  String city;
     private String state;

@@ -17,6 +17,7 @@ import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -84,13 +85,14 @@ public class SellerService {
 //        return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
 //    }
 
-    public ResponseEntity<?> updateProfile(String token,SellerUpdateDTO sellerUpdateDTO) {
-        if(jwtService.validateToken(token)){
-            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-            if(accessToken.isDelete()==true){
-                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-            }
-            String email  = jwtService.getEmailFromJWT(token);
+    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) {
+//        if(jwtService.validateToken(token)){
+//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+//            if(accessToken.isDelete()==true){
+//                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+//            }
+//            String email  = jwtService.getEmailFromJWT(token);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
             Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
 
             if(sellerUpdateDTO.getFirstName()!=null){
@@ -111,55 +113,53 @@ public class SellerService {
             sellerRepo.save(seller);
 
             return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
-
-        }
-        return new ResponseEntity<>("Token is not valid or expired!!",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> updatePassword(String token, ResetPasswordDTO resetPasswordDTO){
-        if(jwtService.validateToken(token)){
-            String email = jwtService.getEmailFromJWT(token);
-            Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
-            if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
-                seller.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
-                sellerRepo.save(seller);
-                emailService.sendMail(seller.getEmail(), "Password Reset","Your password has been updated successfully");
-
-                return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
-            }
-            return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> updatePassword( ResetPasswordDTO resetPasswordDTO){
+//        if(jwtService.validateToken(token)){
+//            String email = jwtService.getEmailFromJWT(token);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
+        if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
+            seller.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
+            sellerRepo.save(seller);
+            emailService.sendMail(seller.getEmail(), "Password Reset","Your password has been updated successfully");
+            return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
         }
-        return new ResponseEntity<>("Token is not valid or expire",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> updateAddress(String token, AddressDTO addressDTO){
-        if(jwtService.validateToken(token)){
-            String email = jwtService.getEmailFromJWT(token);
-            Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist");});
-            Address address = addressRepo.findBySeller(seller).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
-
-            if(addressDTO.getCity()!=null){
-                address.setCity(addressDTO.getCity());
-            }
-            if(addressDTO.getAddressLine()!=null){
-                address.setAddressLine(addressDTO.getAddressLine());
-            }
-            if(addressDTO.getCountry()!=null){
-                address.setCountry(addressDTO.getCountry());
-            }
-            if(addressDTO.getState()!=null){
-                address.setState(addressDTO.getState());
-            }
-            if(addressDTO.getZipCode()!=0){
-                address.setZipCode(addressDTO.getZipCode());
-            }
-            if(addressDTO.getLabel()!=null){
-                address.setLabel(addressDTO.getLabel());
-            }
-            addressRepo.save(address);
-            return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
+    public ResponseEntity<?> updateAddress( AddressDTO addressDTO){
+//        if(jwtService.validateToken(token)){
+//            String email = jwtService.getEmailFromJWT(token);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Token accesstoken = tokenRepo.findByEmail(email).get();
+        if (accesstoken.isDelete() == true) {
+            return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
         }
-        return new ResponseEntity<>("Token is invalid or expire!!",HttpStatus.BAD_REQUEST);
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist");});
+        Address address = addressRepo.findBySeller(seller).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
+        if(addressDTO.getCity()!=null){
+            address.setCity(addressDTO.getCity());
+        }
+        if(addressDTO.getAddressLine()!=null){
+            address.setAddressLine(addressDTO.getAddressLine());
+        }
+        if(addressDTO.getCountry()!=null){
+            address.setCountry(addressDTO.getCountry());
+        }
+        if(addressDTO.getState()!=null){
+            address.setState(addressDTO.getState());
+        }
+        if(addressDTO.getZipCode()!=0){
+            address.setZipCode(addressDTO.getZipCode());
+        }
+        if(addressDTO.getLabel()!=null){
+            address.setLabel(addressDTO.getLabel());
+        }
+        addressRepo.save(address);
+        return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
+
     }
 
 }

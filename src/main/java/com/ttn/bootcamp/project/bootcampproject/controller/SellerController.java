@@ -44,17 +44,17 @@ public class SellerController {
 //    }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateSellerProfile(@RequestParam String token,@RequestBody SellerUpdateDTO sellerUpdateDTO){
-        return sellerService.updateProfile(token,sellerUpdateDTO);
+    public ResponseEntity<?> updateSellerProfile(@RequestBody SellerUpdateDTO sellerUpdateDTO){
+        return sellerService.updateProfile(sellerUpdateDTO);
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateSellerPassword(@RequestParam String token, @RequestBody ResetPasswordDTO resetPasswordDTO){
-        return sellerService.updatePassword(token,resetPasswordDTO);
+    public ResponseEntity<?> updateSellerPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
+        return sellerService.updatePassword(resetPasswordDTO);
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateSellerAddress(@RequestParam String token, @RequestBody AddressDTO addressDTO){
-        return sellerService.updateAddress(token,addressDTO);
+    public ResponseEntity<?> updateSellerAddress(@RequestBody AddressDTO addressDTO){
+        return sellerService.updateAddress(addressDTO);
     }
 }

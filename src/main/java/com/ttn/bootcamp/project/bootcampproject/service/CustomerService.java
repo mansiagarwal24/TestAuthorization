@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -174,19 +175,26 @@ public class CustomerService {
         return new ResponseEntity<>("Token is invalid or expire!!",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> viewAddress(String token){
-        if(jwtService.validateToken(token)){
-            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-            if(accessToken.isDelete()==true){
-                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-            }
-            String email= jwtGenerator.getEmailFromJWT(token);
-            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
-            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
+//    public ResponseEntity<?> viewAddress(){
+//        if(jwtService.validateToken(token)){
+//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+//            if(accessToken.isDelete()==true){
+//                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+//            }
+//            String email= jwtGenerator.getEmailFromJWT(token);
+//            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
+//            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
+//
+//            return new ResponseEntity<>(address,HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>("Token is not valid or incorrect",HttpStatus.BAD_REQUEST);
+//    }
 
-            return new ResponseEntity<>(address,HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Token is not valid or incorrect",HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> viewAddress(){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
+        Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
+        return new ResponseEntity<>(address,HttpStatus.OK);
     }
 
 }

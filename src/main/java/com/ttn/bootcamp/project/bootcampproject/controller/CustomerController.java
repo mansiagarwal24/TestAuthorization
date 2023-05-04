@@ -48,8 +48,8 @@ public class CustomerController {
     }
 
     @GetMapping("/viewAddress")
-    public ResponseEntity<?> viewCustomerAddress(@RequestParam String token){
-        return customerService.viewAddress(token);
+    public ResponseEntity<?> viewCustomerAddress(){
+        return customerService.viewAddress();
     }
 
     @PatchMapping("/updatePassword")

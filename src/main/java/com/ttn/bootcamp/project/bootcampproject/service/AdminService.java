@@ -74,6 +74,7 @@ public class AdminService {
             User user = userRepo.findById(id).get();
             if (!user.isActive()) {
                 user.setActive(true);
+                user.setLocked(false);
                 userRepo.save(user);
                 emailService.sendMail(user.getEmail(), "Account Activation Status", "Your account has been activated.");
                 return new ResponseEntity<>("Account has been activated!!",HttpStatus.OK);
@@ -89,6 +90,7 @@ public class AdminService {
             User user = userRepo.findById(id).get();
             if (user.isActive()) {
                 user.setActive(false);
+                user.setLocked(true);
                 userRepo.save(user);
                 emailService.sendMail(user.getEmail(), "Account Activation Status", "Your account has been deactivated.");
                 return new ResponseEntity<>("Account has been deactivated!!",HttpStatus.OK);
