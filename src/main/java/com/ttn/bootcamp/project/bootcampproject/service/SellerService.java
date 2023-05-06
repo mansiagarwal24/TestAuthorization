@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.UUID;
@@ -44,7 +45,20 @@ public class SellerService {
     TokenRepo tokenRepo;
 
 
-    public void createSeller(SellerDTO sellerDTO){
+    public ResponseEntity<?> createSeller(SellerDTO sellerDTO){
+        if(sellerRepo.existsByEmail(sellerDTO.getEmail())){
+            return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);
+        }
+        if(!sellerDTO.getPassword().equals(sellerDTO.getConfirmPassword())) {
+            return new ResponseEntity<>("Password doesn't match.", HttpStatus.BAD_REQUEST);
+        }
+        if(sellerRepo.existsByCompanyName(sellerDTO.getCompanyName())){
+            return new ResponseEntity<>("Company Name is already registered with other seller",HttpStatus.BAD_REQUEST);
+        }
+        if(sellerRepo.existsByGstNo(sellerDTO.getGstNO())){
+            return new ResponseEntity<>("GST Number is already registered",HttpStatus.BAD_REQUEST);
+        }
+
         Seller seller=new Seller();
         seller.setEmail(sellerDTO.getEmail());
         seller.setFirstName(sellerDTO.getFirstName());
@@ -72,6 +86,8 @@ public class SellerService {
         addressRepo.save(address);
         emailService.sendMail(sellerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
 
+        return new ResponseEntity<>("Register Successfully!!",HttpStatus.OK);
+
     }
 
 
@@ -85,13 +101,17 @@ public class SellerService {
 //        return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
 //    }
 
-    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) {
+    public ResponseEntity<?> updateProfile(String token,SellerUpdateDTO sellerUpdateDTO) {
 //        if(jwtService.validateToken(token)){
 //            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
 //            if(accessToken.isDelete()==true){
 //                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
 //            }
 //            String email  = jwtService.getEmailFromJWT(token);
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        if(accessToken.isDelete()==true){
+            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
             Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
 
@@ -115,13 +135,18 @@ public class SellerService {
             return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePassword( ResetPasswordDTO resetPasswordDTO){
+    public ResponseEntity<?> updatePassword(String token,ResetPasswordDTO resetPasswordDTO){
 //        if(jwtService.validateToken(token)){
 //            String email = jwtService.getEmailFromJWT(token);
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        if(accessToken.isDelete()==true){
+            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
         if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
             seller.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
+            seller.setPasswordUpdateDate(LocalDate.now());
             sellerRepo.save(seller);
             emailService.sendMail(seller.getEmail(), "Password Reset","Your password has been updated successfully");
             return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
@@ -129,9 +154,13 @@ public class SellerService {
         return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> updateAddress( AddressDTO addressDTO){
+    public ResponseEntity<?> updateAddress(String token,AddressDTO addressDTO){
 //        if(jwtService.validateToken(token)){
 //            String email = jwtService.getEmailFromJWT(token);
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        if(accessToken.isDelete()==true){
+            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Token accesstoken = tokenRepo.findByEmail(email).get();
         if (accesstoken.isDelete() == true) {

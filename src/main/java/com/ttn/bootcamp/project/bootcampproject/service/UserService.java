@@ -77,17 +77,15 @@ public class UserService {
         return new ResponseEntity<>("Invalid Email!!",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> logout(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByEmail(email).orElseThrow(() -> {
-            throw new RuntimeException("User doesn't exist!!");
+    public ResponseEntity<?> logout(String accessToken){
+        Token token = tokenRepo.findByToken(accessToken).orElseThrow(() -> {
+            throw new RuntimeException("token  doesn't exist!!");
         });
-        Token accesstoken = tokenRepo.findByEmail(email).get();
-        if (accesstoken.isDelete() == true) {
+        if (token.isDelete()) {
             return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
         } else {
-            accesstoken.setDelete(true);
-            tokenRepo.save(accesstoken);
+            token.setDelete(true);
+            tokenRepo.save(token);
             return new ResponseEntity<>("Account logout successfully!!", HttpStatus.OK);
         }
     }
@@ -102,7 +100,13 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> resetPassword( ResetPasswordDTO resetDTO){
+    public ResponseEntity<?> resetPassword( String accesstoken,ResetPasswordDTO resetDTO){
+        Token token = tokenRepo.findByToken(accesstoken).orElseThrow(() -> {
+            throw new RuntimeException("token  doesn't exist!!");
+        });
+        if (token.isDelete() == true) {
+            return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
         if (StringUtils.isBlank(resetDTO.getPassword())) {

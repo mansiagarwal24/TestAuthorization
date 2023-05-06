@@ -6,6 +6,7 @@ import com.ttn.bootcamp.project.bootcampproject.dto.SellerDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,25 +18,10 @@ import org.springframework.web.bind.annotation.*;
 public class SellerController {
     @Autowired
     SellerService sellerService;
-    @Autowired
-    SellerRepo sellerRepo;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid SellerDTO sellerDTO){
-        if(sellerRepo.existsByEmail(sellerDTO.getEmail())){
-            return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);
-        }
-        if(!sellerDTO.getPassword().equals(sellerDTO.getConfirmPassword())) {
-            return new ResponseEntity<>("Password doesn't match.", HttpStatus.BAD_REQUEST);
-        }
-        if(sellerRepo.existsByCompanyName(sellerDTO.getCompanyName())){
-            return new ResponseEntity<>("Company Name is already registered with other seller",HttpStatus.BAD_REQUEST);
-        }
-        if(sellerRepo.existsByGstNo(sellerDTO.getGstNO())){
-            return new ResponseEntity<>("GST Number is already registered",HttpStatus.BAD_REQUEST);
-        }
-        sellerService.createSeller(sellerDTO);
-        return new ResponseEntity<>("Register Successfully!!", HttpStatus.OK);
+        return sellerService.createSeller(sellerDTO);
     }
 
 //    @GetMapping("/viewProfile")
@@ -44,17 +30,20 @@ public class SellerController {
 //    }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateSellerProfile(@RequestBody SellerUpdateDTO sellerUpdateDTO){
-        return sellerService.updateProfile(sellerUpdateDTO);
+    public ResponseEntity<?> updateSellerProfile(HttpServletRequest request, @RequestBody SellerUpdateDTO sellerUpdateDTO){
+        String token = request.getHeader("Authorization").substring(7);
+        return sellerService.updateProfile(token,sellerUpdateDTO);
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateSellerPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
-        return sellerService.updatePassword(resetPasswordDTO);
+    public ResponseEntity<?> updateSellerPassword(HttpServletRequest request,@RequestBody ResetPasswordDTO resetPasswordDTO){
+        String token = request.getHeader("Authorization").substring(7);
+        return sellerService.updatePassword(token,resetPasswordDTO);
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateSellerAddress(@RequestBody AddressDTO addressDTO){
-        return sellerService.updateAddress(addressDTO);
+    public ResponseEntity<?> updateSellerAddress(HttpServletRequest request,@RequestBody AddressDTO addressDTO){
+        String token= request.getHeader("Authorization").substring(7);
+        return sellerService.updateAddress(token,addressDTO);
     }
 }

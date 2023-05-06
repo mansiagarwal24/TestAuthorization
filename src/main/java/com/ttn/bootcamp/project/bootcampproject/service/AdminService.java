@@ -71,7 +71,7 @@ public class AdminService {
 
     public ResponseEntity<?> activateUser(Long id) {
         if(userRepo.existsById(id)){
-            User user = userRepo.findById(id).get();
+            User user = userRepo.findById(id).orElseThrow(()->{throw new RuntimeException("User not found");});
             if (!user.isActive()) {
                 user.setActive(true);
                 user.setLocked(false);
@@ -87,7 +87,7 @@ public class AdminService {
 
     public ResponseEntity<?> deactivateUser(Long id) {
         if(userRepo.existsById(id)){
-            User user = userRepo.findById(id).get();
+            User user = userRepo.findById(id).orElseThrow(()->{throw new RuntimeException("User not found");});
             if (user.isActive()) {
                 user.setActive(false);
                 user.setLocked(true);

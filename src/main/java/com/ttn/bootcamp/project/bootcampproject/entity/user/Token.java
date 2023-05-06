@@ -9,9 +9,8 @@ import org.hibernate.annotations.Where;
 //@Where(clause = "is_Delete=0")
 public class Token {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "tokenid")
-    @SequenceGenerator(name="tokenid",sequenceName ="token",allocationSize = 1)
-    private Long Id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
     private String email;
     private String token;
     private boolean isDelete=false;

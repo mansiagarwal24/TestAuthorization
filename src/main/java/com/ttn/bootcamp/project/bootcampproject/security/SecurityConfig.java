@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/user/**","/customer/register","/seller/register").permitAll()
-                .requestMatchers("/customer/**").hasAuthority("CUSTOMER")
+                .requestMatchers("/customer/**").hasAnyAuthority("CUSTOMER","ADMIN")
                 .requestMatchers("/seller/**").hasAnyAuthority("SELLER","ADMIN")
                 .requestMatchers("/admin/**").hasAuthority("ADMIN")
                 .anyRequest().authenticated()
@@ -58,7 +58,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.authenticationProvider(authProvider());
+//    }
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)throws Exception{
         return authenticationConfiguration.getAuthenticationManager();

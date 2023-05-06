@@ -13,9 +13,9 @@ import java.util.List;
 @Setter
 @Getter
 public class Role implements GrantedAuthority{
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "roleId")
-    @SequenceGenerator(name="roleId",sequenceName ="role",allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Enumerated(EnumType.STRING)

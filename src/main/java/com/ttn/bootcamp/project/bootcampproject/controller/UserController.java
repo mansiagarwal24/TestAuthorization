@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.controller;
 import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @PutMapping("/activate")
-    public ResponseEntity<?> activateAccount(@RequestHeader String token){
+    public ResponseEntity<?> activateAccount(@RequestParam String token){
         return userService.activate(token);
     }
 
@@ -35,13 +36,15 @@ public class UserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDTO resetDTO){
-        return userService.resetPassword(resetDTO);
+    public ResponseEntity<?> resetPassword(HttpServletRequest request,@RequestBody ResetPasswordDTO resetDTO){
+        String token = request.getHeader("Authorization").substring(7);
+        return userService.resetPassword(token,resetDTO);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(){
-        return userService.logout();
+    public ResponseEntity<?> logout(HttpServletRequest request){
+        String accessToken=request.getHeader("Authorization").substring(7);
+        return userService.logout(accessToken);
     }
 
 }
