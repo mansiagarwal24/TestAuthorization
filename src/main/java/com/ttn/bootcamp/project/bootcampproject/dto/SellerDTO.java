@@ -17,14 +17,13 @@ public class SellerDTO {
             message = "Password should contain atleast 8-15 characters with 1 Lower case, 1 Upper case, 1 Special Character, 1 Number")
     private String password;
     private String confirmPassword;
-
     private String gstNO;
-
     private String companyName;
-
     private String companyAddress;
+
     @Size(max = 10,min = 10)
     private String companyContact;
+
     private String firstName;
     private String lastName;
     private String city;

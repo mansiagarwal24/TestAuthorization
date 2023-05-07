@@ -26,6 +26,7 @@ public class User {
     private boolean isDeleted=false,isActive=false,isExpired=false,isLocked = false;
     private int invalidAttemptCount;
     private LocalDate passwordUpdateDate;
+    private String filePath;
     private String token;
     private LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
 

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class UserService {
@@ -100,27 +101,24 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> resetPassword( String accesstoken,ResetPasswordDTO resetDTO){
-        Token token = tokenRepo.findByToken(accesstoken).orElseThrow(() -> {
-            throw new RuntimeException("token  doesn't exist!!");
-        });
-        if (token.isDelete() == true) {
-            return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> resetPassword(ResetPasswordDTO resetDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
-        if (StringUtils.isBlank(resetDTO.getPassword())) {
-            return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
+        User user = userRepo.findByEmail(resetDTO.getEmail()).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        if(Objects.equals(email, user.getEmail())) {
+            if (StringUtils.isBlank(resetDTO.getPassword())) {
+                return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
+            }
+            if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
+                return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
+            } else {
+                user.setPassword(encoder.encode(resetDTO.getPassword()));
+                LocalDate date = LocalDate.now();
+                user.setPasswordUpdateDate(date);
+                userRepo.save(user);
+                return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
+            }
         }
-        if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
-            return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
-        } else {
-            user.setPassword(encoder.encode(resetDTO.getPassword()));
-            LocalDate date = LocalDate.now();
-            user.setPasswordUpdateDate(date);
-            userRepo.save(user);
-            return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
-        }
+        return new ResponseEntity<>("Incorrect token!!",HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<?> activate(String token) {

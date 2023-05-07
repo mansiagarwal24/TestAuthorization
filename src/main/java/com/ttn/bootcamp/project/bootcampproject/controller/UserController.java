@@ -36,9 +36,8 @@ public class UserController {
     }
 
     @PutMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(HttpServletRequest request,@RequestBody ResetPasswordDTO resetDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return userService.resetPassword(token,resetDTO);
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordDTO resetDTO){
+        return userService.resetPassword(resetDTO);
     }
 
     @PostMapping("/logout")

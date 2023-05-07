@@ -6,8 +6,6 @@ import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
 import com.ttn.bootcamp.project.bootcampproject.repository.*;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTAuthenticationFilter;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
-import io.micrometer.common.util.StringUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +13,13 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Predicate;
+
 
 @Service
-@Slf4j
 public class CustomerService {
     @Autowired
     CustomerRepo customerRepo;
@@ -39,10 +35,7 @@ public class CustomerService {
     JWTGenerator jwtService;
     @Autowired
     RoleRepo roleRepo;
-    @Autowired
-    JWTGenerator jwtGenerator;
-    @Autowired
-    JWTAuthenticationFilter authenticationFilter;
+
     @Autowired
     TokenRepo tokenRepo;
 
@@ -145,51 +138,41 @@ public class CustomerService {
 
     }
 
-    public ResponseEntity<?> updateAddress(String token, AddressDTO addressDTO){
-            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-            if(accessToken.isDelete()){
-                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-            }
-            String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist"));
-            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
+    public ResponseEntity<?> updateAddress(String token,Long id ,AddressDTO addressDTO){
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        if(accessToken.isDelete()){
+            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+        }
+        Address address = addressRepo.findById(id).orElseThrow(()->{throw new RuntimeException("Address not found!!");});
+        Long customerId= address.getCustomer().getUserId();
+        Customer customer = customerRepo.findById(customerId).orElseThrow(()-> new RuntimeException("user not found"));
 
-            if(addressDTO.getCity()!=null){
+        if(Objects.equals(customer.getUserId(), customerId)) {
+            if (addressDTO.getCity() != null) {
                 address.setCity(addressDTO.getCity());
             }
-            if(addressDTO.getAddressLine()!=null){
+            if (addressDTO.getAddressLine() != null) {
                 address.setAddressLine(addressDTO.getAddressLine());
             }
-            if(addressDTO.getCountry()!=null){
+            if (addressDTO.getCountry() != null) {
                 address.setCountry(addressDTO.getCountry());
             }
-            if(addressDTO.getState()!=null){
+            if (addressDTO.getState() != null) {
                 address.setState(addressDTO.getState());
             }
-            if(addressDTO.getZipCode()!=0){
+            if (addressDTO.getZipCode() != 0) {
                 address.setZipCode(addressDTO.getZipCode());
             }
-            if(addressDTO.getLabel()!=null){
+            if (addressDTO.getLabel() != null) {
                 address.setLabel(addressDTO.getLabel());
             }
+
             addressRepo.save(address);
-            return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
+            return new ResponseEntity<>("Address Updated Successfully!!", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Id is incorrect!!",HttpStatus.BAD_REQUEST);
     }
 
-//    public ResponseEntity<?> viewAddress(){
-//        if(jwtService.validateToken(token)){
-//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-//            if(accessToken.isDelete()==true){
-//                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-//            }
-//            String email= jwtGenerator.getEmailFromJWT(token);
-//            Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
-//            Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
-//
-//            return new ResponseEntity<>(address,HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>("Token is not valid or incorrect",HttpStatus.BAD_REQUEST);
-//    }
     public ResponseEntity<?> addNewAddress(String token,AddressDTO addressDTO){
         Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
         if(accessToken.isDelete()){
@@ -227,16 +210,15 @@ public class CustomerService {
     }
 
     public ResponseEntity<?> deleteAddress(String token,Long id){
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()-> new RuntimeException("Token not found!!"));
         if(accessToken.isDelete()){
             return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
         }
 
-        Address address = addressRepo.findById(id).orElseThrow(()->{throw new RuntimeException("Address not found");});
+        Address address = addressRepo.findById(id).orElseThrow(()-> new RuntimeException("Address not found"));
         Long customerId= address.getCustomer().getUserId();
-        Customer customer = customerRepo.findById(customerId).orElseThrow(()->{throw new RuntimeException("user not found");});
-        if(customer.getUserId()==customerId){
+        Customer customer = customerRepo.findById(customerId).orElseThrow(()-> new RuntimeException("user not found"));
+        if(Objects.equals(customer.getUserId(), customerId)){
             addressRepo.delete(address);
             return new ResponseEntity<>("Address deleted Successfully!!",HttpStatus.OK);
         }

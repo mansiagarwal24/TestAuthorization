@@ -1,13 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.AddressDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.SellerDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.SellerUpdateDTO;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Address;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Role;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
+import com.ttn.bootcamp.project.bootcampproject.dto.*;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
 import com.ttn.bootcamp.project.bootcampproject.repository.AddressRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
@@ -90,26 +84,27 @@ public class SellerService {
 
     }
 
+    public ResponseEntity<?> viewProfile(String token, SellerResponseDTO sellerResponseDTO) {
+        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
+        if(accessToken.isDelete()){
+            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+        }
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
 
-//    public ResponseEntity<?> viewProfile(String token){
-//        if(jwtService.validateToken(token)){
-//            String email = jwtService.getEmailFromJWT(token);
-//            Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("Email doesn't exist");});
-//            sellerRepo.getAll(seller);
-//            return new ResponseEntity<>(HttpStatus.OK);
-//        }
-//        return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
-//    }
+        sellerResponseDTO.setLastName((seller.getLastName()));
+        sellerResponseDTO.setFirstName(seller.getFirstName());
+        sellerResponseDTO.setEmail(seller.getEmail());
+        return new ResponseEntity<>(sellerResponseDTO,HttpStatus.OK);
+
+    }
+
+
+
 
     public ResponseEntity<?> updateProfile(String token,SellerUpdateDTO sellerUpdateDTO) {
-//        if(jwtService.validateToken(token)){
-//            Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-//            if(accessToken.isDelete()==true){
-//                return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-//            }
-//            String email  = jwtService.getEmailFromJWT(token);
         Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()==true){
+        if(accessToken.isDelete()){
             return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
         }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -136,10 +131,8 @@ public class SellerService {
     }
 
     public ResponseEntity<?> updatePassword(String token,ResetPasswordDTO resetPasswordDTO){
-//        if(jwtService.validateToken(token)){
-//            String email = jwtService.getEmailFromJWT(token);
         Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()==true){
+        if(accessToken.isDelete()){
             return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
         }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -155,17 +148,12 @@ public class SellerService {
     }
 
     public ResponseEntity<?> updateAddress(String token,AddressDTO addressDTO){
-//        if(jwtService.validateToken(token)){
-//            String email = jwtService.getEmailFromJWT(token);
         Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()==true){
+        if(accessToken.isDelete()){
             return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
         }
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Token accesstoken = tokenRepo.findByEmail(email).get();
-        if (accesstoken.isDelete() == true) {
-            return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
-        }
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist");});
         Address address = addressRepo.findBySeller(seller).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
         if(addressDTO.getCity()!=null){
