@@ -3,18 +3,23 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.*;
-import com.ttn.bootcamp.project.bootcampproject.security.JWTAuthenticationFilter;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+import javax.swing.text.html.parser.Entity;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -38,6 +43,10 @@ public class CustomerService {
 
     @Autowired
     TokenRepo tokenRepo;
+    @Autowired
+    ImageService imageService;
+    @Value("${path}")
+    String path;
 
 
     public ResponseEntity<?> createCustomer(CustomerDTO customerDTO) {
@@ -77,29 +86,24 @@ public class CustomerService {
         return new ResponseEntity<>("Register Successfully",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> viewProfile(String token, CustomerResponseDTO customerResponseDTO) {
-        if (jwtService.validateToken(token)) {
-            String email = jwtService.getEmailFromJWT(token);
-            Customer customer = customerRepo.findByEmail(email).orElseThrow(() -> {
-                throw new RuntimeException("User doesn't exist");
-            });
+    public ResponseEntity<?> viewProfile() {
+        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found!!"));
 
-            customerResponseDTO.setLastName((customer.getLastName()));
-            customerResponseDTO.setFirstName(customer.getFirstName());
-            customerResponseDTO.setEmail(customer.getEmail());
+        CustomerResponseDTO customerResponseDTO = new CustomerResponseDTO();
+        customerResponseDTO.setLastName((customer.getLastName()));
+        customerResponseDTO.setFirstName(customer.getFirstName());
+        customerResponseDTO.setEmail(customer.getEmail());
+        customerResponseDTO.setId(customer.getUserId());
+        customerResponseDTO.setActive(customer.isActive());
 
-            return new ResponseEntity<>(customerResponseDTO,HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Token is invalid or expire!!", HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(customerResponseDTO,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updateProfile(String token, CustomerUpdateDTO customerUpdateDTO) {
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> updateProfile(CustomerUpdateDTO customerUpdateDTO) {
+
         String email  = SecurityContextHolder.getContext().getAuthentication().getName();
-        Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("User doesn't exist!!"));
 
         if(customerUpdateDTO.getFirstName()!=null){
             customer.setFirstName(customerUpdateDTO.getFirstName());
@@ -119,13 +123,10 @@ public class CustomerService {
 
     }
 
-    public ResponseEntity<?> updatePassword(String token, ResetPasswordDTO resetPasswordDTO){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> updatePassword( ResetPasswordDTO resetPasswordDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("user doesn't exist!!"));
+
         if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
             customer.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
             customer.setPasswordUpdateDate(LocalDate.now());
@@ -135,15 +136,10 @@ public class CustomerService {
             return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
         }
         return new ResponseEntity<>("Password should be match",HttpStatus.BAD_REQUEST);
-
     }
 
-    public ResponseEntity<?> updateAddress(String token,Long id ,AddressDTO addressDTO){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
-        Address address = addressRepo.findById(id).orElseThrow(()->{throw new RuntimeException("Address not found!!");});
+    public ResponseEntity<?> updateAddress(Long id ,AddressDTO addressDTO){
+        Address address = addressRepo.findById(id).orElseThrow(()-> new RuntimeException("Address not found!!"));
         Long customerId= address.getCustomer().getUserId();
         Customer customer = customerRepo.findById(customerId).orElseThrow(()-> new RuntimeException("user not found"));
 
@@ -166,21 +162,17 @@ public class CustomerService {
             if (addressDTO.getLabel() != null) {
                 address.setLabel(addressDTO.getLabel());
             }
-
             addressRepo.save(address);
             return new ResponseEntity<>("Address Updated Successfully!!", HttpStatus.OK);
         }
         return new ResponseEntity<>("Id is incorrect!!",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> addNewAddress(String token,AddressDTO addressDTO){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("Your token is invalid or expired!!",HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<?> addNewAddress(AddressDTO addressDTO){
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Customer customer  = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User not found!!");});
+        Customer customer  = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User not found!!"));
+
         Address address = new Address();
         address.setAddressLine(addressDTO.getAddressLine());
         address.setLabel(addressDTO.getLabel());
@@ -189,36 +181,35 @@ public class CustomerService {
         address.setState(addressDTO.getState());
         address.setCity(addressDTO.getCity());
         address.setCustomer(customer);
+
         addressRepo.save(address);
         return new ResponseEntity<>("Address added successfully!!",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> viewAddress(String token){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
-
+    public ResponseEntity<?> viewAddress(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Customer customer = customerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user not found");});
-        Long customerId = customer.getUserId();
-//        Address address = addressRepo.findByCustomer(customer).orElseThrow(()->{throw new RuntimeException("user not found");});
-        Address address = addressRepo.findById(customerId).orElseThrow(()->{throw new RuntimeException("There is no address found to this corresponding user!!");});
-        List<Address> addressList  = new ArrayList<>();
-        addressList.add(address);
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("user not found"));
+        List<Address> addressList  = customer.getAddressList();
         return new ResponseEntity<>(addressList,HttpStatus.OK);
     }
+//    public String uploadCustomerProfileImage(MultipartFile file) throws IOException {
+//        String email=SecurityContextHolder.getContext().getAuthentication().getName();
+//        Customer customer=customerRepo.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("Customer not found."));
+//        customer.setFilePath(path+"/"+file.getOriginalFilename());
+//        customerRepo.save(customer);
+//        file.transferTo(new File(path+"/"+file.getOriginalFilename()));
+//        return "Image Uploaded";
+//    }
 
-    public ResponseEntity<?> deleteAddress(String token,Long id){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()-> new RuntimeException("Token not found!!"));
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> deleteAddress(Long id){
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Address address = addressRepo.findById(id).orElseThrow(()-> new RuntimeException("Address not found"));
+        if(address.getCustomer()==null){
+            return new ResponseEntity<>("This Id does not belongs to Customer",HttpStatus.BAD_REQUEST);
         }
 
-        Address address = addressRepo.findById(id).orElseThrow(()-> new RuntimeException("Address not found"));
-        Long customerId= address.getCustomer().getUserId();
-        Customer customer = customerRepo.findById(customerId).orElseThrow(()-> new RuntimeException("user not found"));
-        if(Objects.equals(customer.getUserId(), customerId)){
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("user not found"));
+        if(addressRepo.existsByCustomer(customer)){
             addressRepo.delete(address);
             return new ResponseEntity<>("Address deleted Successfully!!",HttpStatus.OK);
         }

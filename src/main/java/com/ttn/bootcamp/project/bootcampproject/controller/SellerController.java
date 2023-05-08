@@ -24,26 +24,23 @@ public class SellerController {
         return sellerService.createSeller(sellerDTO);
     }
 
-//    @GetMapping("/viewProfile")
-//    public ResponseEntity<?> findOne(@RequestParam String token){
-//        return sellerService.viewProfile(token);
-//    }
+    @GetMapping("/viewProfile")
+    public ResponseEntity<?> viewSellerProfile(){
+        return sellerService.viewProfile();
+    }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateSellerProfile(HttpServletRequest request, @RequestBody SellerUpdateDTO sellerUpdateDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return sellerService.updateProfile(token,sellerUpdateDTO);
+    public ResponseEntity<?> updateSellerProfile(@RequestBody SellerUpdateDTO sellerUpdateDTO){
+        return sellerService.updateProfile(sellerUpdateDTO);
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateSellerPassword(HttpServletRequest request,@RequestBody ResetPasswordDTO resetPasswordDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return sellerService.updatePassword(token,resetPasswordDTO);
+    public ResponseEntity<?> updateSellerPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
+        return sellerService.updatePassword(resetPasswordDTO);
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateSellerAddress(HttpServletRequest request,@RequestBody AddressDTO addressDTO){
-        String token= request.getHeader("Authorization").substring(7);
-        return sellerService.updateAddress(token,addressDTO);
+    public ResponseEntity<?> updateSellerAddress(@RequestBody AddressDTO addressDTO){
+        return sellerService.updateAddress(addressDTO);
     }
 }

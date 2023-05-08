@@ -67,8 +67,6 @@ public class AdminService {
         return new ResponseEntity<>(sellerList,HttpStatus.OK);
     }
 
-
-
     public ResponseEntity<?> activateUser(Long id) {
         if(userRepo.existsById(id)){
             User user = userRepo.findById(id).orElseThrow(()->{throw new RuntimeException("User not found");});

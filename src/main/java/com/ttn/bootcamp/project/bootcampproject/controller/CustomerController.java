@@ -25,44 +25,37 @@ public class CustomerController {
     }
 
     @GetMapping("/viewProfile")
-    public ResponseEntity<?> viewProfile(HttpServletRequest request, @RequestBody CustomerResponseDTO customerResponseDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.viewProfile(token,customerResponseDTO);
+    public ResponseEntity<?> viewProfile(){
+        return customerService.viewProfile();
     }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateCustomerProfile(HttpServletRequest request,@RequestBody CustomerUpdateDTO customerUpdateDTO){
-        String token=request.getHeader("Authorization").substring(7);
-        return customerService.updateProfile(token,customerUpdateDTO);
+    public ResponseEntity<?> updateCustomerProfile(@RequestBody CustomerUpdateDTO customerUpdateDTO){
+        return customerService.updateProfile(customerUpdateDTO);
     }
 
     @GetMapping("/viewAddress")
-    public ResponseEntity<?> viewCustomerAddress(HttpServletRequest request){
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.viewAddress(token);
+    public ResponseEntity<?> viewCustomerAddress(){
+        return customerService.viewAddress();
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateCustomerPassword(HttpServletRequest request, @RequestBody ResetPasswordDTO resetPasswordDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.updatePassword(token,resetPasswordDTO);
+    public ResponseEntity<?> updateCustomerPassword( @RequestBody ResetPasswordDTO resetPasswordDTO){
+        return customerService.updatePassword(resetPasswordDTO);
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateCustomerAddress(HttpServletRequest request, @RequestBody AddressDTO addressDTO){
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.updateAddress(token,addressDTO);
+    public ResponseEntity<?> updateCustomerAddress(@RequestParam Long id, @RequestBody AddressDTO addressDTO){
+        return customerService.updateAddress(id,addressDTO);
     }
 
     @PostMapping("/addNewAddress")
-    public ResponseEntity<?> addNewCustomerAddress(HttpServletRequest request, @RequestBody AddressDTO addressDTO) {
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.addNewAddress(token, addressDTO);
+    public ResponseEntity<?> addNewCustomerAddress(@RequestBody AddressDTO addressDTO) {
+        return customerService.addNewAddress(addressDTO);
     }
 
     @DeleteMapping("/deleteAddress")
-    public ResponseEntity<?> deleteCustomerAddress(HttpServletRequest request,@RequestParam Long id) {
-        String token = request.getHeader("Authorization").substring(7);
-        return customerService.deleteAddress(token,id);
+    public ResponseEntity<?> deleteCustomerAddress(@RequestParam Long id) {
+        return customerService.deleteAddress(id);
     }
 }

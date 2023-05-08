@@ -1,10 +1,14 @@
 package com.ttn.bootcamp.project.bootcampproject.security;
 
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
+import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,12 +25,26 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     JWTGenerator jwtGenerator;
     @Autowired
     CustomUserDetailsService userDetailsService;
+    @Autowired
+    TokenRepo tokenRepo;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getJWTFromRequest(request);
         if(StringUtils.hasText(token) && jwtGenerator.validateToken(token)) {
-            String userName = jwtGenerator.getEmailFromJWT(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            Token accessToken = tokenRepo.findByToken(token).orElse(null);
+            if(accessToken==null){
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.getWriter().write("Token Not Found!!");
+                return;
+            }
+            if(accessToken.isDelete()){
+                response.setStatus(HttpStatus.NOT_FOUND.value());
+                response.getWriter().write("Token is Expired or Invalid!!");
+                return;
+            }
+
+            String email = jwtGenerator.getEmailFromJWT(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
                     (userDetails, null,userDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -38,7 +56,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     public String getJWTFromRequest(HttpServletRequest request){
         String bearerToken =request.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")){
-            return bearerToken.substring(7,bearerToken.length());
+            return bearerToken.substring(7);
         }
         return null;
     }

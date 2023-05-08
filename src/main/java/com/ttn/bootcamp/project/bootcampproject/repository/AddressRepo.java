@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface AddressRepo extends JpaRepository<Address,Long> {
     Optional<Address> findBySeller(Seller seller);
     Optional<Address> findByCustomer(Customer customer);
+    boolean existsByCustomer(Customer customer);
 
 
 }

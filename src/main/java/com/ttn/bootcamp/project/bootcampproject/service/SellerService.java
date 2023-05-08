@@ -84,59 +84,49 @@ public class SellerService {
 
     }
 
-    public ResponseEntity<?> viewProfile(String token, SellerResponseDTO sellerResponseDTO) {
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> viewProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
 
+        SellerResponseDTO sellerResponseDTO =new SellerResponseDTO();
         sellerResponseDTO.setLastName((seller.getLastName()));
         sellerResponseDTO.setFirstName(seller.getFirstName());
         sellerResponseDTO.setEmail(seller.getEmail());
+        sellerResponseDTO.setCompanyContact(seller.getCompanyContact());
+        sellerResponseDTO.setId(seller.getUserId());
+        sellerResponseDTO.setCompanyName(seller.getCompanyName());
+        sellerResponseDTO.setActive(seller.isActive());
         return new ResponseEntity<>(sellerResponseDTO,HttpStatus.OK);
 
     }
 
-
-
-
-    public ResponseEntity<?> updateProfile(String token,SellerUpdateDTO sellerUpdateDTO) {
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-            Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
 
-            if(sellerUpdateDTO.getFirstName()!=null){
-                seller.setFirstName(sellerUpdateDTO.getFirstName());
-            }
-            if(sellerUpdateDTO.getLastName()!=null){
-                seller.setLastName(sellerUpdateDTO.getLastName());
-            }
-            if(sellerUpdateDTO.getCompanyContact()!=null){
-                seller.setCompanyContact(sellerUpdateDTO.getCompanyContact());
-            }
-            if(sellerUpdateDTO.getMiddleName()!=null){
-                seller.setMiddleName(sellerUpdateDTO.getMiddleName());
-            }
-            if(sellerUpdateDTO.getCompanyName()!=null){
-                seller.setCompanyName(sellerUpdateDTO.getCompanyName());
-            }
-            sellerRepo.save(seller);
+        if(sellerUpdateDTO.getFirstName()!=null){
+            seller.setFirstName(sellerUpdateDTO.getFirstName());
+        }
+        if(sellerUpdateDTO.getLastName()!=null){
+            seller.setLastName(sellerUpdateDTO.getLastName());
+        }
+        if(sellerUpdateDTO.getCompanyContact()!=null){
+            seller.setCompanyContact(sellerUpdateDTO.getCompanyContact());
+        }
+        if(sellerUpdateDTO.getMiddleName()!=null){
+            seller.setMiddleName(sellerUpdateDTO.getMiddleName());
+        }
+        if(sellerUpdateDTO.getCompanyName()!=null){
+            seller.setCompanyName(sellerUpdateDTO.getCompanyName());
+        }
+        sellerRepo.save(seller);
 
-            return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
+        return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePassword(String token,ResetPasswordDTO resetPasswordDTO){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
+    public ResponseEntity<?> updatePassword(ResetPasswordDTO resetPasswordDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("user doesn't exist!!");});
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("user doesn't exist!!"));
         if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
             seller.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
             seller.setPasswordUpdateDate(LocalDate.now());
@@ -147,15 +137,10 @@ public class SellerService {
         return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> updateAddress(String token,AddressDTO addressDTO){
-        Token accessToken = tokenRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Token not found!!");});
-        if(accessToken.isDelete()){
-            return new ResponseEntity<>("your token is expired or incorrect",HttpStatus.UNAUTHORIZED);
-        }
-
+    public ResponseEntity<?> updateAddress(AddressDTO addressDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist");});
-        Address address = addressRepo.findBySeller(seller).orElseThrow(()->{throw new RuntimeException("User doesn't found!!");});
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist"));
+        Address address = addressRepo.findBySeller(seller).orElseThrow(()-> new RuntimeException("User doesn't found!!"));
         if(addressDTO.getCity()!=null){
             address.setCity(addressDTO.getCity());
         }

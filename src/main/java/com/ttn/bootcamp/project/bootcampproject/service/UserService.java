@@ -4,10 +4,12 @@ import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import io.micrometer.common.util.StringUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Service
+@Slf4j
 public class UserService {
     @Autowired
     UserRepo userRepo;
@@ -37,15 +40,18 @@ public class UserService {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    I18Service i18Service;
+
     public ResponseEntity<?> login(LoginDTO loginDTO){
-        User user = userRepo.findByEmail(loginDTO.getEmail()).get();
+        User user = userRepo.findByEmail(loginDTO.getEmail()).orElseThrow(()->new ResourcesNotFoundException("Email not found!!"));
         if (!user.isActive()) {
             return new ResponseEntity<>("please activate your account", HttpStatus.UNAUTHORIZED);
         }
         if (user.isLocked()) {
             return new ResponseEntity<>("Your account is locked. please contact to admin", HttpStatus.UNAUTHORIZED);
         }
-
+//        log.info(user.getEmail());
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -102,9 +108,8 @@ public class UserService {
     }
 
     public ResponseEntity<?> resetPassword(ResetPasswordDTO resetDTO){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(resetDTO.getEmail()).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
-        if(Objects.equals(email, user.getEmail())) {
             if (StringUtils.isBlank(resetDTO.getPassword())) {
                 return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
             }
@@ -112,18 +117,18 @@ public class UserService {
                 return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
             } else {
                 user.setPassword(encoder.encode(resetDTO.getPassword()));
+                user.setLocked(false);
+                user.setInvalidAttemptCount(0);
                 LocalDate date = LocalDate.now();
                 user.setPasswordUpdateDate(date);
                 userRepo.save(user);
                 return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
             }
-        }
-        return new ResponseEntity<>("Incorrect token!!",HttpStatus.UNAUTHORIZED);
     }
 
     public ResponseEntity<?> activate(String token) {
         User user =userRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Invalid Token!!");});
-        if(user.getExpiryTime()==LocalDateTime.now()){
+        if(user.getExpiryTime().isBefore(LocalDateTime.now())){
             return new ResponseEntity<>("your token is expired!! please go to resend email activation link!!",HttpStatus.BAD_REQUEST);
         }
         if(user==null){
@@ -131,7 +136,7 @@ public class UserService {
         }
         user.setActive(true);
         userRepo.save(user);
-        return new ResponseEntity<>("Your account has been activated",HttpStatus.OK);
+        return new ResponseEntity<>(i18Service.getMsg("user.activate"),HttpStatus.OK);
     }
 }
 
