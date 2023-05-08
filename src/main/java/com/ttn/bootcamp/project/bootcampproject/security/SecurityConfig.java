@@ -58,10 +58,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Override
-//    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.authenticationProvider(authProvider());
-//    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)throws Exception{
         return authenticationConfiguration.getAuthenticationManager();

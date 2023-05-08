@@ -46,4 +46,9 @@ public class UserController {
         return userService.logout(accessToken);
     }
 
+    @PostMapping("/resendEmail")
+    public ResponseEntity<?> resendEmail(@RequestParam String email){
+        return userService.resendEmail(email);
+    }
+
 }

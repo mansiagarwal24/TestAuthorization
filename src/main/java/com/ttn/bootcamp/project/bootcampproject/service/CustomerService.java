@@ -42,7 +42,7 @@ public class CustomerService {
     RoleRepo roleRepo;
 
     @Autowired
-    TokenRepo tokenRepo;
+    I18Service i18Service;
     @Autowired
     ImageService imageService;
     @Value("${path}")
@@ -83,7 +83,7 @@ public class CustomerService {
         addressRepo.save(address);
         emailService.sendMail(customerDTO.getEmail(), "Activation Code ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + uuid);
 
-        return new ResponseEntity<>("Register Successfully",HttpStatus.OK);
+        return new ResponseEntity<>(i18Service.getMsg("customer.register"),HttpStatus.OK);
     }
 
     public ResponseEntity<?> viewProfile() {
@@ -140,10 +140,9 @@ public class CustomerService {
 
     public ResponseEntity<?> updateAddress(Long id ,AddressDTO addressDTO){
         Address address = addressRepo.findById(id).orElseThrow(()-> new RuntimeException("Address not found!!"));
-        Long customerId= address.getCustomer().getUserId();
-        Customer customer = customerRepo.findById(customerId).orElseThrow(()-> new RuntimeException("user not found"));
-
-        if(Objects.equals(customer.getUserId(), customerId)) {
+        if(address.getCustomer()==null){
+            return new ResponseEntity<>("This id doesn't belong to customer!!",HttpStatus.BAD_REQUEST);
+        }
             if (addressDTO.getCity() != null) {
                 address.setCity(addressDTO.getCity());
             }
@@ -164,8 +163,6 @@ public class CustomerService {
             }
             addressRepo.save(address);
             return new ResponseEntity<>("Address Updated Successfully!!", HttpStatus.OK);
-        }
-        return new ResponseEntity<>("Id is incorrect!!",HttpStatus.BAD_REQUEST);
     }
 
     public ResponseEntity<?> addNewAddress(AddressDTO addressDTO){

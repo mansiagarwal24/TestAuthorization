@@ -40,7 +40,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateCustomerPassword( @RequestBody ResetPasswordDTO resetPasswordDTO){
+    public ResponseEntity<?> updateCustomerPassword( @Valid @RequestBody ResetPasswordDTO resetPasswordDTO){
         return customerService.updatePassword(resetPasswordDTO);
     }
 

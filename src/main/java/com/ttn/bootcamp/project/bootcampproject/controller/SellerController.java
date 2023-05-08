@@ -35,12 +35,12 @@ public class SellerController {
     }
 
     @PatchMapping("/updatePassword")
-    public ResponseEntity<?> updateSellerPassword(@RequestBody ResetPasswordDTO resetPasswordDTO){
+    public ResponseEntity<?> updateSellerPassword(@RequestBody @Valid ResetPasswordDTO resetPasswordDTO){
         return sellerService.updatePassword(resetPasswordDTO);
     }
 
     @PatchMapping("/updateAddress")
-    public ResponseEntity<?> updateSellerAddress(@RequestBody AddressDTO addressDTO){
-        return sellerService.updateAddress(addressDTO);
+    public ResponseEntity<?> updateSellerAddress(@RequestParam Long id,@RequestBody AddressDTO addressDTO){
+        return sellerService.updateAddress(id,addressDTO);
     }
 }

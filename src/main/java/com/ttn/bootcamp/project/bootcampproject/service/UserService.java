@@ -23,6 +23,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -85,9 +87,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> logout(String accessToken){
-        Token token = tokenRepo.findByToken(accessToken).orElseThrow(() -> {
-            throw new RuntimeException("token  doesn't exist!!");
-        });
+        Token token = tokenRepo.findByToken(accessToken).orElseThrow(() -> new RuntimeException("token  doesn't exist!!"));
         if (token.isDelete()) {
             return new ResponseEntity<>("You are not logged in", HttpStatus.UNAUTHORIZED);
         } else {
@@ -103,27 +103,27 @@ public class UserService {
             emailService.sendMail(email,"Reset Password Link","Please use this link to reset your password again: "+"\n http://localhost:8080/user/resetPassword?token="+token);
             return new ResponseEntity<>("Reset password link sent successfully ",HttpStatus.OK);
         }
-        return new ResponseEntity<>("User not found",HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(i18Service.getMsg("user.forgotPassword"),HttpStatus.BAD_REQUEST);
 
     }
 
     public ResponseEntity<?> resetPassword(ResetPasswordDTO resetDTO){
 //        String email = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepo.findByEmail(resetDTO.getEmail()).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
-            if (StringUtils.isBlank(resetDTO.getPassword())) {
-                return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
-            }
-            if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
-                return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
-            } else {
-                user.setPassword(encoder.encode(resetDTO.getPassword()));
-                user.setLocked(false);
-                user.setInvalidAttemptCount(0);
-                LocalDate date = LocalDate.now();
-                user.setPasswordUpdateDate(date);
-                userRepo.save(user);
-                return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
-            }
+        if (StringUtils.isBlank(resetDTO.getPassword())) {
+            return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
+        }
+        if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
+            return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
+        } else {
+            user.setPassword(encoder.encode(resetDTO.getPassword()));
+            user.setLocked(false);
+            user.setInvalidAttemptCount(0);
+            LocalDate date = LocalDate.now();
+            user.setPasswordUpdateDate(date);
+            userRepo.save(user);
+            return new ResponseEntity<>("Password reset successfully!!", HttpStatus.OK);
+        }
     }
 
     public ResponseEntity<?> activate(String token) {
@@ -137,6 +137,19 @@ public class UserService {
         user.setActive(true);
         userRepo.save(user);
         return new ResponseEntity<>(i18Service.getMsg("user.activate"),HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> resendEmail(String email){
+        if(userRepo.existsByEmail(email)){
+            User user = userRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("Email not found!!"));
+            if(user.isActive()){
+                return new ResponseEntity<>("Your account is already activated!!",HttpStatus.OK);
+            }
+            String token  = UUID.randomUUID().toString();
+            emailService.sendMail(email, "Activation Link ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + token);
+            return new ResponseEntity<>("Email is sent!!",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Email is not registered!!",HttpStatus.BAD_REQUEST);
     }
 }
 

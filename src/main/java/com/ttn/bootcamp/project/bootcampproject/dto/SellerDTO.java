@@ -17,9 +17,6 @@ public class SellerDTO {
             message = "Password should contain atleast 8-15 characters with 1 Lower case, 1 Upper case, 1 Special Character, 1 Number")
     private String password;
     private String confirmPassword;
-
-    @Pattern(regexp = "^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$",
-            message = "GST must be a valid GST number")
     private String gstNO;
 
     private String companyName;

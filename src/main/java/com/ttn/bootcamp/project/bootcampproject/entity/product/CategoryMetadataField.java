@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class CategoryMetadataField {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @SequenceGenerator(name="userid",sequenceName ="category_metadata_field",initialValue = 1,allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="userId")
+    @SequenceGenerator(name="userid",sequenceName ="category_metadata_field",allocationSize = 1)
     private Long id;
     private String name;
 

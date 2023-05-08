@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.AddressRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
@@ -29,14 +30,14 @@ public class SellerService {
     AddressRepo addressRepo;
     @Autowired
     EmailService emailService;
-    @Autowired
-    JWTGenerator jwtService;
+
     @Autowired
     RoleRepo roleRepo;
     @Autowired
     PasswordEncoder encoder;
     @Autowired
-    TokenRepo tokenRepo;
+    I18Service i18Service;
+
 
 
     public ResponseEntity<?> createSeller(SellerDTO sellerDTO){
@@ -80,7 +81,7 @@ public class SellerService {
         addressRepo.save(address);
         emailService.sendMail(sellerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
 
-        return new ResponseEntity<>("Register Successfully!!",HttpStatus.OK);
+        return new ResponseEntity<>(i18Service.getMsg("seller.register"),HttpStatus.OK);
 
     }
 
@@ -102,7 +103,7 @@ public class SellerService {
 
     public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
 
         if(sellerUpdateDTO.getFirstName()!=null){
             seller.setFirstName(sellerUpdateDTO.getFirstName());
@@ -137,10 +138,14 @@ public class SellerService {
         return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<?> updateAddress(AddressDTO addressDTO){
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist"));
-        Address address = addressRepo.findBySeller(seller).orElseThrow(()-> new RuntimeException("User doesn't found!!"));
+    public ResponseEntity<?> updateAddress(Long id,AddressDTO addressDTO){
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+//        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist"));
+//        Address address = addressRepo.findBySeller(seller).orElseThrow(()-> new RuntimeException("User doesn't found!!"));
+        Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found!!"));
+        if(address.getSeller()==null){
+            return new ResponseEntity<>("This id doesn't belong to seller!!",HttpStatus.BAD_REQUEST);
+        }
         if(addressDTO.getCity()!=null){
             address.setCity(addressDTO.getCity());
         }
