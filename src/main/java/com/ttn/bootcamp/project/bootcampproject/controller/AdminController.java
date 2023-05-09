@@ -1,12 +1,11 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
-import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
-import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
 import com.ttn.bootcamp.project.bootcampproject.service.AdminService;
+import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
     @Autowired
     AdminService adminService;
+
+    @Autowired
+    CategoryService categoryService;
 
 
     @GetMapping("/customers")
@@ -36,5 +38,34 @@ public class AdminController {
     @PutMapping("/deactivate-user/{id}")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id){
        return adminService.deactivateUser(id);
+    }
+
+
+
+     //CATEGORY API
+
+    @PostMapping("/addMetaDataField")
+    public ResponseEntity<?> addMetadataField(@Valid @RequestBody CategoryMetadataField categoryMetadataField){
+        return categoryService.addMetadataField(categoryMetadataField);
+    }
+
+    @GetMapping("/getMetadataField")
+    public ResponseEntity<?> getMetadataField(@RequestParam int offSet,@RequestParam int size,@RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
+        return categoryService.getMetadataField(offSet,size,orderBy,sortBy);
+    }
+
+    @PostMapping("/addCategory")
+    public ResponseEntity<?> addCategory(@RequestParam String categoryName,@RequestParam(required = false) Long parentId){
+        return categoryService.addCategory(categoryName,parentId);
+    }
+
+    @GetMapping("/viewCategory")
+    public ResponseEntity<?> viewCategory(@RequestParam Long id){
+        return categoryService.viewCategory(id);
+    }
+
+    @GetMapping("/viewAllCategory")
+    public ResponseEntity<?> viewCategory(@RequestParam int offSet, @RequestParam int size, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
+        return categoryService.viewAllCategories(offSet,size,orderBy,sortBy);
     }
 }

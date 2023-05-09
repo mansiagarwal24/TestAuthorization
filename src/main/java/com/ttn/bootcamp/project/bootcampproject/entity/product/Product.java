@@ -2,8 +2,10 @@ package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

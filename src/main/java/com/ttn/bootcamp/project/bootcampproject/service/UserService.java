@@ -107,9 +107,9 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> resetPassword(ResetPasswordDTO resetDTO){
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByEmail(resetDTO.getEmail()).orElseThrow(()->{throw new RuntimeException("User doesn't exist!!");});
+    public ResponseEntity<?> resetPassword(String token,ResetPasswordDTO resetDTO){
+        String email = jwtGenerator.getEmailFromJWT(token);
+        User user = userRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
         if (StringUtils.isBlank(resetDTO.getPassword())) {
             return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
         }
@@ -118,6 +118,7 @@ public class UserService {
         } else {
             user.setPassword(encoder.encode(resetDTO.getPassword()));
             user.setLocked(false);
+            user.setActive(true);
             user.setInvalidAttemptCount(0);
             LocalDate date = LocalDate.now();
             user.setPasswordUpdateDate(date);
@@ -127,7 +128,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> activate(String token) {
-        User user =userRepo.findByToken(token).orElseThrow(()->{throw new RuntimeException("Invalid Token!!");});
+        User user =userRepo.findByToken(token).orElseThrow(()-> new RuntimeException("Invalid Token!!"));
         if(user.getExpiryTime().isBefore(LocalDateTime.now())){
             return new ResponseEntity<>("your token is expired!! please go to resend email activation link!!",HttpStatus.BAD_REQUEST);
         }
