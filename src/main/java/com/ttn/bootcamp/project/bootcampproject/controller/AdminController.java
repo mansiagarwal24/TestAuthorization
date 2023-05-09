@@ -1,6 +1,8 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
+import com.ttn.bootcamp.project.bootcampproject.dto.CategoryUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import com.ttn.bootcamp.project.bootcampproject.service.AdminService;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import jakarta.validation.Valid;
@@ -68,4 +70,14 @@ public class AdminController {
     public ResponseEntity<?> viewCategory(@RequestParam int offSet, @RequestParam int size, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
         return categoryService.viewAllCategories(offSet,size,orderBy,sortBy);
     }
+
+    @PutMapping("/updateCategory")
+    public ResponseEntity<?> updateCategory(@RequestParam Long id,@RequestBody CategoryUpdateDTO categoryUpdateDTO){
+        return categoryService.updateCategory(id,categoryUpdateDTO);
+    }
+
+//    @PostMapping("/addMetaDataFieldValues")
+//    public ResponseEntity<?> addMetaDataValues(@RequestBody CategoryMetadataFieldValues categoryMetadataFieldValues){
+//        return categoryService.addMetadataFieldValues(categoryMetadataFieldValues);
+//    }
 }

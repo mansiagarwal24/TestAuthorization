@@ -16,6 +16,7 @@ public class Product {
 
     private String brand;
     private boolean isCancellable=false,isActive=false,isReturnable=false,isDeleted=false;
+
     @ManyToOne
     @JoinColumn(name="sellerId")
     private Seller seller;

@@ -1,11 +1,14 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CategoryMetadataResponse;
+import com.ttn.bootcamp.project.bootcampproject.dto.CategoryUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryMetadataFieldRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.MetaDataValuesRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -23,6 +27,8 @@ public class CategoryService {
     CategoryMetadataFieldRepo categoryMetadataFieldRepo;
     @Autowired
     CategoryRepo categoryRepo;
+    @Autowired
+    MetaDataValuesRepo metaDataValuesRepo;
 
     public ResponseEntity<?> addMetadataField(CategoryMetadataField categoryMetadataField){
         if(categoryMetadataFieldRepo.existsByFieldName(categoryMetadataField.getFieldName())){
@@ -86,5 +92,28 @@ public class CategoryService {
         }
         return new ResponseEntity<>(categoryList,HttpStatus.OK);
     }
+
+    public ResponseEntity<?> updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO){
+        Category category = categoryRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("Id is not valid"));
+        if(categoryRepo.existsByName(categoryUpdateDTO.getCategoryName())){
+            return new ResponseEntity<>("Category name is already defined!!",HttpStatus.BAD_REQUEST);
+        }
+        Category parentCategory=categoryRepo.findById(categoryUpdateDTO.getParentId()).orElseThrow(()->new ResourcesNotFoundException("No parent exist for this id!!"));
+        category.setName(category.getName());
+        category.setParentCategory(parentCategory);
+        categoryRepo.save(category);
+        return new ResponseEntity<>("Category Updated successfully!!",HttpStatus.OK);
+    }
+
+//    public ResponseEntity<?> addMetadataFieldValues(CategoryMetadataFieldValues metadataValues){
+//        CategoryMetadataFieldValues metadataFieldValues = metaDataValuesRepo.CategoryMetadataFieldId
+//                (metadataValues.getCategoryMetadataId().getCategoryMetadataFieldId()).orElseThrow(()->new ResourcesNotFoundException("Id doesn't Exist!!"));
+//
+//        metadataFieldValues.setCategoryMetadataId(metadataValues.getCategoryMetadataId());
+//        metadataFieldValues.setValue(metadataValues.getValue());
+//        metaDataValuesRepo.save(metadataFieldValues);
+//        return new ResponseEntity<>("Metadata Field Values are added Successfully!!",HttpStatus.OK);
+//
+//    }
 
 }
