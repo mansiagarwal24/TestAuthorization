@@ -13,11 +13,13 @@ public class CategoryMetadataFieldValues {
     @EmbeddedId
     private CategoryMetaDataId categoryMetadataId;
 
-//    @ManyToOne
-//    private CategoryMetadataField categoryMetadataFieldList;
-//
-//    @ManyToOne
-//    private Category categories;
+    @ManyToOne
+    @MapsId("categoryMetadataFieldId")
+    private CategoryMetadataField categoryMetadataField;
+
+    @ManyToOne
+    @MapsId("categoryId")
+    private Category category;
 
 
     @Column

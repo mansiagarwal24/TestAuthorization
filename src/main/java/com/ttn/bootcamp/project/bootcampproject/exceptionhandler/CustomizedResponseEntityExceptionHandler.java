@@ -29,6 +29,13 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(GenericMessageException.class)
+    public final ResponseEntity<ErrorDetails> handleGenericMessageExceptions(Exception ex, WebRequest request) throws Exception {
+        ErrorDetails errorDetails = new ErrorDetails(
+                LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String,String> errors = new HashMap<>();

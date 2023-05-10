@@ -2,13 +2,17 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CategoryMetadataResponse;
 import com.ttn.bootcamp.project.bootcampproject.dto.CategoryUpdateDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.MetadataFieldValuesDTO;
+import com.ttn.bootcamp.project.bootcampproject.entity.compositekeys.CategoryMetaDataId;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryMetadataFieldRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.MetaDataValuesRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -70,11 +74,13 @@ public class CategoryService {
     public ResponseEntity<?> viewCategory(Long categoryId){
         Category category = categoryRepo.findById(categoryId).orElseThrow(()->new ResourcesNotFoundException("Id not found!!"));
         List<Category> categoryList = new ArrayList<>();
-        Category parentCategory = category.getParentCategory();
-        if(parentCategory != null){
-            Category categories = categoryRepo.findById(parentCategory.getId()).orElseThrow(()-> new ResourcesNotFoundException("parent category not found!!"));
-            categoryList.add(categories);
-        }
+//        Category parentCategory = category.getParentCategory();
+//        if(parentCategory != null){
+//            Category categories = categoryRepo.findById(parentCategory.getId()).orElseThrow(()-> new ResourcesNotFoundException("parent category not found!!"));
+//            categoryList.add(categories);
+//        }
+        Category child = categoryRepo.findByParentCategory(category);
+        categoryList.add(child);
         categoryList.add(category);
         return new ResponseEntity<>(categoryList,HttpStatus.OK);
     }
@@ -93,27 +99,59 @@ public class CategoryService {
         return new ResponseEntity<>(categoryList,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO){
+    public void  updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO){
         Category category = categoryRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("Id is not valid"));
         if(categoryRepo.existsByName(categoryUpdateDTO.getCategoryName())){
-            return new ResponseEntity<>("Category name is already defined!!",HttpStatus.BAD_REQUEST);
+            throw new GenericMessageException("Category Name is already exist!!");
         }
         Category parentCategory=categoryRepo.findById(categoryUpdateDTO.getParentId()).orElseThrow(()->new ResourcesNotFoundException("No parent exist for this id!!"));
         category.setName(category.getName());
         category.setParentCategory(parentCategory);
         categoryRepo.save(category);
-        return new ResponseEntity<>("Category Updated successfully!!",HttpStatus.OK);
     }
 
-//    public ResponseEntity<?> addMetadataFieldValues(CategoryMetadataFieldValues metadataValues){
-//        CategoryMetadataFieldValues metadataFieldValues = metaDataValuesRepo.CategoryMetadataFieldId
-//                (metadataValues.getCategoryMetadataId().getCategoryMetadataFieldId()).orElseThrow(()->new ResourcesNotFoundException("Id doesn't Exist!!"));
-//
-//        metadataFieldValues.setCategoryMetadataId(metadataValues.getCategoryMetadataId());
-//        metadataFieldValues.setValue(metadataValues.getValue());
-//        metaDataValuesRepo.save(metadataFieldValues);
-//        return new ResponseEntity<>("Metadata Field Values are added Successfully!!",HttpStatus.OK);
-//
-//    }
+    public void addMetadataFieldValues(MetadataFieldValuesDTO metadataFieldValuesDTO){
+        Long categoryId = metadataFieldValuesDTO.getCategoryId();
+        Category category=categoryRepo.findById(categoryId).orElseThrow(()->new ResourcesNotFoundException("Category Id not Found"));
+
+        Long categoryMetadataFieldId = metadataFieldValuesDTO.getCategoryMetaDataFieldId();
+        CategoryMetadataField categoryMetadataField=categoryMetadataFieldRepo.findById(categoryMetadataFieldId).orElseThrow(()->new ResourcesNotFoundException("Category MetadataId not found."));
+
+        CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
+        CategoryMetaDataId id = new CategoryMetaDataId();
+        id.setCategoryId(categoryId);
+        id.setCategoryMetadataFieldId(categoryMetadataFieldId);
+
+        if(metaDataValuesRepo.existsById(id)) {
+            throw new GenericMessageException("ids already exist!!");
+        }
+
+        metadataFieldValues.setCategoryMetadataId(id);
+        metadataFieldValues.setCategoryMetadataField(categoryMetadataField);
+        metadataFieldValues.setCategory(category);
+        metadataFieldValues.setValue(metadataFieldValuesDTO.getValues());
+
+        metaDataValuesRepo.save(metadataFieldValues);
+    }
+
+    public void updateMetadataFieldValues(MetadataFieldValuesDTO metadataFieldValuesDTO){
+        Category category = categoryRepo.findById(metadataFieldValuesDTO.getCategoryId())
+                .orElseThrow(()->new ResourcesNotFoundException("Category Id not Found"));
+
+        CategoryMetadataField categoryMetadataField = categoryMetadataFieldRepo.findById(metadataFieldValuesDTO.getCategoryMetaDataFieldId())
+                .orElseThrow(()->new ResourcesNotFoundException("Category Metadata field Id not Found"));
+
+        CategoryMetaDataId id = new CategoryMetaDataId();
+        id.setCategoryId(category.getId());
+        id.setCategoryMetadataFieldId(categoryMetadataField.getId());
+
+        if(!metaDataValuesRepo.existsById(id)) {
+            throw new GenericMessageException("Ids not exist!!");
+        }
+        CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
+        metadataFieldValues.setValue(metadataFieldValuesDTO.getValues());
+        metaDataValuesRepo.save(metadataFieldValues);
+        }
+
 
 }

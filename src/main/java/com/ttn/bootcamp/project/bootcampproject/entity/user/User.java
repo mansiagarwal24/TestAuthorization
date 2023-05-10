@@ -33,4 +33,7 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> role;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    private Token accessToken;
+
 }

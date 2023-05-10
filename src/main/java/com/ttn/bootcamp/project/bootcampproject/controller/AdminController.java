@@ -1,6 +1,9 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.CategoryUpdateDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.MetadataFieldValuesDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.SellerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import com.ttn.bootcamp.project.bootcampproject.service.AdminService;
@@ -8,8 +11,11 @@ import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -23,23 +29,30 @@ public class AdminController {
 
     @GetMapping("/customers")
     public ResponseEntity<?> getCustomer(@RequestParam int pageOffSet,@RequestParam int pageSize,@RequestParam String sort){
-        return adminService.findAllCustomer(pageOffSet,pageSize,sort);
+        List<CustomerResponseDTO> customerList = adminService.findAllCustomer(pageOffSet, pageSize, sort);
+        return new ResponseEntity<>(customerList, HttpStatus.OK);
     }
 
     @GetMapping("/sellers")
     public ResponseEntity<?> getSeller(@RequestParam(defaultValue = "10",required = false) int pageOffSet,@RequestParam int pageSize,@RequestParam String sort){
-        return adminService.findAllSeller(pageOffSet,pageSize,sort);
-
+        List<SellerResponseDTO> sellerList = adminService.findAllSeller(pageOffSet, pageSize, sort);
+        return new ResponseEntity<>(sellerList, HttpStatus.OK);
     }
 
     @PutMapping("/activate-user/{id}")
     public ResponseEntity<?> activateUser(@PathVariable Long id){
-        return adminService.activateUser(id);
+        if(adminService.activateUser(id) ){
+            return new ResponseEntity<>("Account has been activated!!", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Account is already activated", HttpStatus.OK);
     }
 
     @PutMapping("/deactivate-user/{id}")
     public ResponseEntity<?> deactivateUser(@PathVariable Long id){
-       return adminService.deactivateUser(id);
+        if(adminService.deactivateUser(id)) {
+            return new ResponseEntity<>("Account has been deactivated!!", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Account is already deactivated", HttpStatus.OK);
     }
 
 
@@ -73,11 +86,19 @@ public class AdminController {
 
     @PutMapping("/updateCategory")
     public ResponseEntity<?> updateCategory(@RequestParam Long id,@RequestBody CategoryUpdateDTO categoryUpdateDTO){
-        return categoryService.updateCategory(id,categoryUpdateDTO);
+        categoryService.updateCategory(id,categoryUpdateDTO);
+        return new ResponseEntity<>("category updated successfully!!",HttpStatus.OK);
     }
 
-//    @PostMapping("/addMetaDataFieldValues")
-//    public ResponseEntity<?> addMetaDataValues(@RequestBody CategoryMetadataFieldValues categoryMetadataFieldValues){
-//        return categoryService.addMetadataFieldValues(categoryMetadataFieldValues);
-//    }
+    @PostMapping("/add-metadata-field-values")
+    public ResponseEntity<?> addMetaDataValues(@RequestBody @Valid MetadataFieldValuesDTO metadataFieldValuesDTO){
+        categoryService.addMetadataFieldValues(metadataFieldValuesDTO);
+        return new ResponseEntity<>("MetaData field values added!!",HttpStatus.OK);
+    }
+
+    @PutMapping("/update-metadata-field-values")
+    public ResponseEntity<?> updateMetaDataValues(@RequestBody @Valid MetadataFieldValuesDTO metadataFieldValuesDTO){
+        categoryService.updateMetadataFieldValues(metadataFieldValuesDTO);
+        return new ResponseEntity<>("MetaData field values are updated!!",HttpStatus.OK);
+    }
 }

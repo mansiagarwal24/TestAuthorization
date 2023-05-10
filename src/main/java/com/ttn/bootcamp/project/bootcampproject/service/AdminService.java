@@ -5,9 +5,12 @@ import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.SellerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,9 +33,11 @@ public class AdminService {
     UserRepo userRepo;
     @Autowired
     EmailService emailService;
+    @Autowired
+    TokenRepo tokenRepo;
 
 
-    public ResponseEntity<List<CustomerResponseDTO>> findAllCustomer(int pageOffSet,int pageSize,String sortBy) {
+    public List<CustomerResponseDTO> findAllCustomer(int pageOffSet,int pageSize,String sortBy) {
         PageRequest page = PageRequest.of(pageOffSet,pageSize, Sort.Direction.ASC,sortBy);
         Page<Customer> customersPages = customerRepo.findAll(page);
         List<CustomerResponseDTO> customerList=new ArrayList<>();
@@ -45,10 +50,10 @@ public class AdminService {
             customerResponseDTO.setLastName(customer.getLastName());
             customerList.add(customerResponseDTO);
         }
-        return new ResponseEntity<>(customerList,HttpStatus.OK);
+        return customerList;
     }
 
-    public ResponseEntity<List<SellerResponseDTO>> findAllSeller(int pageOffSet, int pageSize, String sortBy) {
+    public List<SellerResponseDTO> findAllSeller(int pageOffSet, int pageSize, String sortBy) {
         PageRequest page = PageRequest.of(pageOffSet,pageSize, Sort.Direction.ASC,sortBy);
         Page<Seller> sellersPage = sellerRepo.findAll(page);
         List<SellerResponseDTO> sellerList=new ArrayList<>();
@@ -64,39 +69,34 @@ public class AdminService {
             sellerResponseDTO.setCompanyAddress(seller.getAddress());
             sellerList.add(sellerResponseDTO);
         }
-        return new ResponseEntity<>(sellerList,HttpStatus.OK);
+        return sellerList;
     }
 
-    public ResponseEntity<?> activateUser(Long id) {
-        if(userRepo.existsById(id)){
-            User user = userRepo.findById(id).orElseThrow(()->{throw new RuntimeException("User not found");});
+    public boolean activateUser(Long id) {
+            User user = userRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("User not found"));
             if (!user.isActive()) {
                 user.setActive(true);
                 user.setLocked(false);
                 userRepo.save(user);
                 emailService.sendMail(user.getEmail(), "Account Activation Status", "Your account has been activated.");
-                return new ResponseEntity<>("Account has been activated!!",HttpStatus.OK);
+                return true;
             }
-            return new ResponseEntity<>("Account is already activated!!",HttpStatus.OK);
-        }
-        return new ResponseEntity<>("User doesn't exist!!", HttpStatus.BAD_REQUEST);
-
+            return false;
     }
 
-    public ResponseEntity<?> deactivateUser(Long id) {
-        if(userRepo.existsById(id)){
-            User user = userRepo.findById(id).orElseThrow(()->{throw new RuntimeException("User not found");});
+    public boolean deactivateUser(Long id) {
+            User user = userRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("User not found"));
             if (user.isActive()) {
                 user.setActive(false);
                 user.setLocked(true);
+                Token token = tokenRepo.findByEmail(user.getEmail()).orElseThrow();
+                token.setDelete(true);
+                tokenRepo.save(token);
                 userRepo.save(user);
                 emailService.sendMail(user.getEmail(), "Account Activation Status", "Your account has been deactivated.");
-                return new ResponseEntity<>("Account has been deactivated!!",HttpStatus.OK);
+                return true;
             }
-            return new ResponseEntity<>("Account is already deactivated!!",HttpStatus.OK);
+            return false;
         }
-        return new ResponseEntity<>("User doesn't exist!!", HttpStatus.BAD_REQUEST);
-    }
-
 }
 

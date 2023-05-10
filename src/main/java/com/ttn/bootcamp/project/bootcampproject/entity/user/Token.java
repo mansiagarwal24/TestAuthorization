@@ -14,6 +14,7 @@ public class Token {
     private String email;
     private String token;
     private boolean isDelete=false;
+
     @OneToOne(cascade = CascadeType.ALL)
     private User user;
 }
