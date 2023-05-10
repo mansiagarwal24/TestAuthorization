@@ -17,6 +17,6 @@ public class Category {
     @JoinColumn(name = "parentCategoryId")
     private Category parentCategory;
 
-    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
-    List<CategoryMetadataFieldValues> categoryMetadataFieldValues;
+//    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+//    List<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 }

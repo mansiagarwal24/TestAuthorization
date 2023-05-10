@@ -21,13 +21,10 @@ public class Bootstrap implements ApplicationListener {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     RoleRepo roleRepo;
-
     @Autowired
     UserRepo userRepo;
-
     @Value("${admin.email}")
     String email;
 

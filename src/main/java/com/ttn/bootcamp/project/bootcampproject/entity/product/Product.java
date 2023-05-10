@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name="sellerId")
+    @JsonIgnore
     private Seller seller;
 
     @ManyToOne

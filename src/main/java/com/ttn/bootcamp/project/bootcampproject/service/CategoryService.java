@@ -12,7 +12,6 @@ import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFou
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryMetadataFieldRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.MetaDataValuesRepo;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -99,13 +97,15 @@ public class CategoryService {
         return new ResponseEntity<>(categoryList,HttpStatus.OK);
     }
 
-    public void  updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO){
+    public void updateCategory(Long id, CategoryUpdateDTO categoryUpdateDTO){
         Category category = categoryRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("Id is not valid"));
+
         if(categoryRepo.existsByName(categoryUpdateDTO.getCategoryName())){
             throw new GenericMessageException("Category Name is already exist!!");
         }
         Category parentCategory=categoryRepo.findById(categoryUpdateDTO.getParentId()).orElseThrow(()->new ResourcesNotFoundException("No parent exist for this id!!"));
-        category.setName(category.getName());
+
+        category.setName(categoryUpdateDTO.getCategoryName());
         category.setParentCategory(parentCategory);
         categoryRepo.save(category);
     }
@@ -151,7 +151,10 @@ public class CategoryService {
         CategoryMetadataFieldValues metadataFieldValues = new CategoryMetadataFieldValues();
         metadataFieldValues.setValue(metadataFieldValuesDTO.getValues());
         metaDataValuesRepo.save(metadataFieldValues);
-        }
+
+    }
+
+
 
 
 }

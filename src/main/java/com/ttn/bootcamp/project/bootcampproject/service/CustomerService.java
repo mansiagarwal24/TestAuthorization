@@ -4,25 +4,17 @@ import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
-import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.PasswordMismatch;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.*;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 
-import javax.swing.text.html.parser.Entity;
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -52,7 +44,7 @@ public class CustomerService {
     String path;
 
 
-    public Customer createCustomer(CustomerDTO customerDTO) {
+    public void createCustomer(CustomerDTO customerDTO) {
         if(customerRepo.existsByEmail(customerDTO.getEmail())){
             log.error("User input email: " + customerDTO.getEmail() + " Email already registered!");
             throw new GenericMessageException("Email Already Registered!!");
@@ -85,9 +77,6 @@ public class CustomerService {
         userRepo.save(customer);
         addressRepo.save(address);
         emailService.sendMail(customerDTO.getEmail(), "Activation Code ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + uuid);
-        return customer;
-
-
     }
 
     public CustomerResponseDTO viewProfile() {
