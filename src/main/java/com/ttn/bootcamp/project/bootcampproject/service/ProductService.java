@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ProductUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Product;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
@@ -97,6 +98,62 @@ public class ProductService {
             throw new GenericMessageException("You have not created this product!!");
         }
         productRepo.deleteById(productId);
+    }
+
+    public void updateProduct(Long id, ProductUpdateDTO productUpdateDTO){
+        Product product = productRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("product not found for this id!!"));
+
+        if(productUpdateDTO.getProductName() != null){
+            product.setName(productUpdateDTO.getProductName());
+        }
+        product.setCancellable(productUpdateDTO.isCancel());
+        product.setReturnable(productUpdateDTO.isReturn());
+        if(productUpdateDTO.getDescription()!=null){
+            product.setDescription(productUpdateDTO.getDescription());
+        }
+        productRepo.save(product);
+    }
+
+    public void viewProductByCustomter(Long productId){
+        Product product = productRepo.findById(productId).orElseThrow(()->new ResourcesNotFoundException("No product found for this id!!"));
+
+        if(product.isDeleted()){
+            throw new GenericMessageException("This product is not available or deleted!!");
+        }
+
+
+    }
+
+    public boolean activateProduct(Long id){
+        Product product=productRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("No product found for this id!!"));
+
+        String email = product.getSeller().getEmail();
+        if(product.isDeleted()){
+            throw new GenericMessageException("Product is deleted!!");
+        }
+        if(!product.isActive()){
+            product.setActive(true);
+            productRepo.save(product);
+            emailService.sendMail(email,"Product Activation Status","Your product has been activated now!");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean deactivateProduct(Long id){
+        Product product=productRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("No product found for this id!!"));
+
+        String email = product.getSeller().getEmail();
+        if(product.isDeleted()){
+            throw new GenericMessageException("Product is deleted!!");
+        }
+        if(product.isActive()){
+            product.setActive(false);
+            productRepo.save(product);
+            emailService.sendMail(email,"Product Activation Status","Your product has been deactivated now!");
+            return true;
+        }
+        return false;
     }
 
 

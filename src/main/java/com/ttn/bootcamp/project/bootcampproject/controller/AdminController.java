@@ -8,6 +8,7 @@ import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataF
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import com.ttn.bootcamp.project.bootcampproject.service.AdminService;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
+import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -25,6 +26,8 @@ public class AdminController {
 
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ProductService productService;
 
 
     @GetMapping("/customers")
@@ -100,5 +103,22 @@ public class AdminController {
     public ResponseEntity<?> updateMetaDataValues(@RequestBody @Valid MetadataFieldValuesDTO metadataFieldValuesDTO){
         categoryService.updateMetadataFieldValues(metadataFieldValuesDTO);
         return new ResponseEntity<>("MetaData field values are updated!!",HttpStatus.OK);
+    }
+
+    //PRODUCT API
+
+    @PutMapping("/activateProduct")
+    public ResponseEntity<?> activateProduct(@RequestParam Long id){
+        if(productService.activateProduct(id)){
+            return new ResponseEntity<>("Product has been activated!!",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Product is already activated!!",HttpStatus.OK);
+    }
+    @PutMapping("/deactivateProduct")
+    public ResponseEntity<?> deactivateProduct(@RequestParam Long id){
+        if(productService.deactivateProduct(id)){
+            return new ResponseEntity<>("Product has been deactivated!!",HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Product is already deactivated!!",HttpStatus.OK);
     }
 }
