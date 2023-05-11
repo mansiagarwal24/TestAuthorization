@@ -2,6 +2,7 @@ package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
+import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
 import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,8 @@ public class SellerController {
     @Autowired
     SellerService sellerService;
     @Autowired
+    CategoryService categoryService;
+    @Autowired
     ProductService productService;
 
     @PostMapping("/register")
@@ -30,7 +33,7 @@ public class SellerController {
     }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateSellerProfile(@RequestBody SellerUpdateDTO sellerUpdateDTO){
+    public ResponseEntity<?> updateSellerProfile(@Valid @RequestBody SellerUpdateDTO sellerUpdateDTO){
         return sellerService.updateProfile(sellerUpdateDTO);
     }
 
@@ -44,10 +47,26 @@ public class SellerController {
         return sellerService.updateAddress(id,addressDTO);
     }
 
+    //CATEGORY API
+
+    @GetMapping("/viewAllCategories")
+    public ResponseEntity<?> viewAllCategories(){
+        return new ResponseEntity<>( categoryService.getAllCategoriesForSeller(),HttpStatus.OK);
+    }
+
+
+
+
+
+
+
+
+
+
     //PRODUCT API
 
     @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@RequestBody ProductDTO productDTO){
+    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO){
         productService.addProduct(productDTO);
         return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
     }

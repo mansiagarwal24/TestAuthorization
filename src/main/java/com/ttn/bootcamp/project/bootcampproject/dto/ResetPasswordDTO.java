@@ -9,6 +9,7 @@ public class ResetPasswordDTO {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,15}$",
             message = "Password should contain atleast 8-15 characters with 1 Lower case, 1 Upper case, 1 Special Character, 1 Number")
     private String password;
+    @Email
     private String email;
 
     private String confirmPassword;

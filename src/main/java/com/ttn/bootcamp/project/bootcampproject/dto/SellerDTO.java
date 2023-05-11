@@ -3,9 +3,11 @@ package com.ttn.bootcamp.project.bootcampproject.dto;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Address;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
 
 @Data
 public class SellerDTO {
@@ -16,16 +18,23 @@ public class SellerDTO {
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,15}$",
             message = "Password should contain atleast 8-15 characters with 1 Lower case, 1 Upper case, 1 Special Character, 1 Number")
     private String password;
+    @NotBlank
     private String confirmPassword;
+
+    @NotBlank
+    @Length(min=15,max=15)
     private String gstNO;
 
+    @NotBlank
     private String companyName;
     private String companyAddress;
 
     @Size(max = 10,min = 10)
     private String companyContact;
 
+    @NotBlank
     private String firstName;
+    @NotBlank
     private String lastName;
     private String city;
     private String state;

@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.ttn.bootcamp.project.bootcampproject.entity.compositekeys.ProductReviewsId;
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,11 +14,13 @@ public class ProductReviews {
 
     private String review;
     private int rating;
-//
-//    @ManyToOne
-//    private Customer customer;
-//
-//    @ManyToOne
-//    private Product product;
+
+    @ManyToOne
+    @MapsId("customerUserId")
+    private Customer customer;
+
+    @ManyToOne
+    @MapsId("productId")
+    private Product product;
 
 }

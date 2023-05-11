@@ -1,11 +1,8 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
-import com.ttn.bootcamp.project.bootcampproject.dto.CategoryUpdateDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.MetadataFieldValuesDTO;
-import com.ttn.bootcamp.project.bootcampproject.dto.SellerResponseDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.*;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataField;
-import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import com.ttn.bootcamp.project.bootcampproject.service.AdminService;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
@@ -64,31 +61,35 @@ public class AdminController {
 
     @PostMapping("/addMetaDataField")
     public ResponseEntity<?> addMetadataField(@Valid @RequestBody CategoryMetadataField categoryMetadataField){
-        return categoryService.addMetadataField(categoryMetadataField);
+        categoryService.addMetadataField(categoryMetadataField);
+        return new ResponseEntity<>("category field name is added!!"+categoryMetadataField,HttpStatus.OK);
+
     }
 
     @GetMapping("/getMetadataField")
     public ResponseEntity<?> getMetadataField(@RequestParam int offSet,@RequestParam int size,@RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
-        return categoryService.getMetadataField(offSet,size,orderBy,sortBy);
+        List<CategoryMetadataResponseDTO> metaDataList=categoryService.getMetadataField(offSet,size,orderBy,sortBy);
+        return new ResponseEntity<>(metaDataList,HttpStatus.OK);
     }
 
     @PostMapping("/addCategory")
     public ResponseEntity<?> addCategory(@RequestParam String categoryName,@RequestParam(required = false) Long parentId){
-        return categoryService.addCategory(categoryName,parentId);
+        categoryService.addCategory(categoryName,parentId);
+        return new ResponseEntity<>("Category Added Successfully!!",HttpStatus.OK);
     }
 
     @GetMapping("/viewCategory")
     public ResponseEntity<?> viewCategory(@RequestParam Long id){
-        return categoryService.viewCategory(id);
+        return new ResponseEntity<>(categoryService.viewCategory(id),HttpStatus.OK);
     }
 
     @GetMapping("/viewAllCategory")
     public ResponseEntity<?> viewCategory(@RequestParam int offSet, @RequestParam int size, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
-        return categoryService.viewAllCategories(offSet,size,orderBy,sortBy);
+        return new ResponseEntity<>(categoryService.viewAllCategories(offSet,size,orderBy,sortBy),HttpStatus.OK);
     }
 
     @PutMapping("/updateCategory")
-    public ResponseEntity<?> updateCategory(@RequestParam Long id,@RequestBody CategoryUpdateDTO categoryUpdateDTO){
+    public ResponseEntity<?> updateCategory(@RequestParam Long id,@Valid @RequestBody CategoryUpdateDTO categoryUpdateDTO){
         categoryService.updateCategory(id,categoryUpdateDTO);
         return new ResponseEntity<>("category updated successfully!!",HttpStatus.OK);
     }

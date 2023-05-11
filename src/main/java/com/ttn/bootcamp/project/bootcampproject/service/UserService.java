@@ -4,6 +4,7 @@ import com.ttn.bootcamp.project.bootcampproject.dto.LoginDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ResetPasswordDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
@@ -48,7 +49,7 @@ public class UserService {
     public ResponseEntity<?> login(LoginDTO loginDTO){
         User user = userRepo.findByEmail(loginDTO.getEmail()).orElseThrow(()->new ResourcesNotFoundException("Email not found!!"));
         if (!user.isActive()) {
-            return new ResponseEntity<>("please activate your account", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>("Your account is not activated!!", HttpStatus.UNAUTHORIZED);
         }
         if (user.isLocked()) {
             return new ResponseEntity<>("Your account is locked. please contact to admin", HttpStatus.UNAUTHORIZED);
@@ -140,17 +141,14 @@ public class UserService {
         return new ResponseEntity<>(i18Service.getMsg("user.activate"),HttpStatus.OK);
     }
 
-    public ResponseEntity<?> resendEmail(String email){
+    public void resendEmail(String email){
         if(userRepo.existsByEmail(email)){
-            User user = userRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("Email not found!!"));
-            if(user.isActive()){
-                return new ResponseEntity<>("Your account is already activated!!",HttpStatus.OK);
-            }
+            User user = userRepo.findByEmail(email).get();
+            user.setExpiryTime(LocalDateTime.now().plusMinutes(15));
             String token  = UUID.randomUUID().toString();
             emailService.sendMail(email, "Activation Link ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + token);
-            return new ResponseEntity<>("Email is sent!!",HttpStatus.OK);
         }
-        return new ResponseEntity<>("Email is not registered!!",HttpStatus.BAD_REQUEST);
+        throw new ResourcesNotFoundException("Email not found!!");
     }
 }
 

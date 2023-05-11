@@ -42,6 +42,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 response.getWriter().write("Token is Expired or Invalid!!");
                 return;
             }
+            if(!accessToken.getUser().isActive() && accessToken.getUser().isLocked()){
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.getWriter().write("User not activated!!");
+                return;
+            }
 
             String email = jwtGenerator.getEmailFromJWT(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);

@@ -5,11 +5,13 @@ import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
+import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import com.ttn.bootcamp.project.bootcampproject.service.CustomerService;
 import com.ttn.bootcamp.project.bootcampproject.service.I18Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,7 @@ public class CustomerController {
     @Autowired
     CustomerService customerService;
     @Autowired
-    CustomerRepo customerRepo;
+    CategoryService categoryService;
     @Autowired
     I18Service i18Service;
 
@@ -36,7 +38,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateCustomerProfile(@RequestBody CustomerUpdateDTO customerUpdateDTO){
+    public ResponseEntity<?> updateCustomerProfile(@Valid @RequestBody CustomerUpdateDTO customerUpdateDTO){
         customerService.updateProfile(customerUpdateDTO);
         return new ResponseEntity<>("Profile updated Successfully!!",HttpStatus.OK);
     }
@@ -77,5 +79,13 @@ public class CustomerController {
         }
         customerService.deleteAddress(id);
         return new ResponseEntity<>("Address Deleted Successfully!!",HttpStatus.OK);
+    }
+
+
+    //CATEGORY API
+
+    @GetMapping("/viewCategory")
+    public ResponseEntity<?> viewCategoryById(@RequestParam Long id){
+        return new ResponseEntity<>(categoryService.viewCategoryForCustomer(id),HttpStatus.OK);
     }
 }

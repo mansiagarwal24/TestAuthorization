@@ -1,7 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,8 +11,11 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Data
-@Inheritance(strategy = InheritanceType.JOINED)
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userid")

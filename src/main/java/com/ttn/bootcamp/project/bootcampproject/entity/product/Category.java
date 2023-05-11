@@ -1,12 +1,17 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -17,6 +22,6 @@ public class Category {
     @JoinColumn(name = "parentCategoryId")
     private Category parentCategory;
 
-//    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
-//    List<CategoryMetadataFieldValues> categoryMetadataFieldValues;
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    List<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 }

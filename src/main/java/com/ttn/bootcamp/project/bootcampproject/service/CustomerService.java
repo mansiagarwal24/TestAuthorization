@@ -49,9 +49,9 @@ public class CustomerService {
             log.error("User input email: " + customerDTO.getEmail() + " Email already registered!");
             throw new GenericMessageException("Email Already Registered!!");
         }
-//        if(!customerDTO.getPassword().equals(customerDTO.getConfirmPassword())) {
-//            return new ResponseEntity<>("Password doesn't match.", HttpStatus.BAD_REQUEST);
-//        }
+        if(!customerDTO.getPassword().equals(customerDTO.getConfirmPassword())) {
+            throw new GenericMessageException("Password and confirm password should be same!!");
+        }
         Customer customer = new Customer();
         customer.setEmail(customerDTO.getEmail());
         customer.setFirstName(customerDTO.getFirstName());

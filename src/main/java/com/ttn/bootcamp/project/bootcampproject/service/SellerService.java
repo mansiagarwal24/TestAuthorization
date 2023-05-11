@@ -23,14 +23,12 @@ import java.util.UUID;
 
 @Service
 public class SellerService {
-
     @Autowired
     SellerRepo sellerRepo;
     @Autowired
     AddressRepo addressRepo;
     @Autowired
     EmailService emailService;
-
     @Autowired
     RoleRepo roleRepo;
     @Autowired
@@ -74,12 +72,11 @@ public class SellerService {
 
         Role role = roleRepo.findByAuthority(Authority.SELLER).orElse(null);
         seller.setRole(Collections.singletonList(role));
-        String uuid = String.valueOf(UUID.randomUUID());
-        seller.setToken(uuid);
+
 
         sellerRepo.save(seller);
         addressRepo.save(address);
-        emailService.sendMail(sellerDTO.getEmail(),"Activation Code ","Please Activate your account by clicking on the below link"+"\n http://localhost:8080/user/activate?token="+uuid);
+        emailService.sendMail(sellerDTO.getEmail(),"Registration Successful ","Your account has been registered.we will update you once your account has been activated.");
 
         return new ResponseEntity<>(i18Service.getMsg("seller.register"),HttpStatus.OK);
 

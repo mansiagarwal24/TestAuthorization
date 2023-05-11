@@ -48,7 +48,8 @@ public class UserController {
 
     @PostMapping("/resendEmail")
     public ResponseEntity<?> resendEmail(@RequestParam String email){
-        return userService.resendEmail(email);
+        userService.resendEmail(email);
+        return new ResponseEntity<>("Resend Email sent successfully!!",HttpStatus.OK);
     }
 
 }
