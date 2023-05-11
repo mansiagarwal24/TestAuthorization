@@ -50,18 +50,12 @@ public class CustomerController {
 
     @PatchMapping("/updatePassword")
     public ResponseEntity<?> updateCustomerPassword( @Valid @RequestBody ResetPasswordDTO resetPasswordDTO){
-        if(!resetPasswordDTO.getPassword().equals(resetPasswordDTO.getConfirmPassword())){
-            return new ResponseEntity<>("Password should be same!!",HttpStatus.BAD_REQUEST);
-        }
         customerService.updatePassword(resetPasswordDTO);
         return new ResponseEntity<>("Password update Successfully!!",HttpStatus.OK);
     }
 
     @PatchMapping("/updateAddress")
     public ResponseEntity<?> updateCustomerAddress(@RequestParam Long id, @RequestBody AddressDTO addressDTO){
-        if(!customerService.checkAddressId(id)){
-            return new ResponseEntity<>("This id doesn't belong to customer!!",HttpStatus.BAD_REQUEST);
-        }
         customerService.updateAddress(id,addressDTO);
         return new ResponseEntity<>("Address Update Successfully!!",HttpStatus.OK);
     }
@@ -74,9 +68,6 @@ public class CustomerController {
 
     @DeleteMapping("/deleteAddress")
     public ResponseEntity<?> deleteCustomerAddress(@RequestParam Long id) {
-        if(!customerService.checkAddressId(id)){
-            return new ResponseEntity<>("This Id does not belongs to Customer",HttpStatus.BAD_REQUEST);
-        }
         customerService.deleteAddress(id);
         return new ResponseEntity<>("Address Deleted Successfully!!",HttpStatus.OK);
     }

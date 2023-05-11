@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
+import com.ttn.bootcamp.project.bootcampproject.Audit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString@Inheritance(strategy = InheritanceType.JOINED)
-public class User {
+public class User extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userid")
     @SequenceGenerator(name="userid",sequenceName ="user_seq",allocationSize = 1)

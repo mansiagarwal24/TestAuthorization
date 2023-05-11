@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ttn.bootcamp.project.bootcampproject.Audit;
 import com.ttn.bootcamp.project.bootcampproject.entity.compositekeys.CategoryMetaDataId;
 import com.ttn.bootcamp.project.bootcampproject.StringListConverter;
 import jakarta.persistence.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class CategoryMetadataFieldValues {
+public class CategoryMetadataFieldValues extends Audit {
     @EmbeddedId
     private CategoryMetaDataId categoryMetadataId;
 

@@ -1,11 +1,12 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
+import com.ttn.bootcamp.project.bootcampproject.Audit;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
-public class Address {
+public class Address extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;

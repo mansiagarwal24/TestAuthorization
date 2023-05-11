@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ttn.bootcamp.project.bootcampproject.Audit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class Category {
+public class Category extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;

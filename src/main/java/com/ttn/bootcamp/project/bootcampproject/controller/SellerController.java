@@ -1,6 +1,7 @@
 package com.ttn.bootcamp.project.bootcampproject.controller;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.*;
+import com.ttn.bootcamp.project.bootcampproject.repository.ProductVariationRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
@@ -65,10 +66,15 @@ public class SellerController {
 
     //PRODUCT API
 
-    @PostMapping("/addProduct")
-    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO){
-        productService.addProduct(productDTO);
-        return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
+//    @PostMapping("/addProduct")
+//    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO){
+//        productService.addProduct(productDTO);
+//        return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
+//    }
+    @PostMapping("/addProductVariation")
+    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductVariationDTO productVariationDTO){
+        productService.addProductVariation(productVariationDTO);
+        return new ResponseEntity<>("Product Variation added Successfully!!",HttpStatus.OK);
     }
 
     @GetMapping("/viewProduct")

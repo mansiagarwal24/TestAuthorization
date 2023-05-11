@@ -13,8 +13,10 @@ public class ProductVariation {
     private int quantityAvailable;
     private Long price;
     private boolean isActive;
-    //image
-    private String primaryImageName;
+    @Column(columnDefinition = "json")
+    private String metaData;
+//    //image
+//    private String primaryImageName;
 
     @ManyToOne
     @JoinColumn(name="productId")

@@ -10,6 +10,8 @@ import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -115,6 +117,9 @@ public class CustomerService {
 
     public void updatePassword( ResetPasswordDTO resetPasswordDTO) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(!resetPasswordDTO.getPassword().equals(resetPasswordDTO.getConfirmPassword())){
+            throw new GenericMessageException("Password and confirm password should be same!!");
+        }
         Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("user doesn't exist!!"));
         customer.setPassword(encoder.encode(resetPasswordDTO.getPassword()));
         customer.setPasswordUpdateDate(LocalDate.now());
@@ -123,6 +128,9 @@ public class CustomerService {
     }
 
     public void updateAddress(Long id ,AddressDTO addressDTO){
+        if(!customerRepo.existsById(id)){
+            throw new GenericMessageException("This id doesn't belong to customer!!");
+        }
         Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found!!"));
             if (addressDTO.getCity() != null) {
                 address.setCity(addressDTO.getCity());
@@ -177,6 +185,9 @@ public class CustomerService {
 //    }
 
     public void deleteAddress(Long id){
+        if(!customerRepo.existsById(id)){
+            throw new GenericMessageException("This Id does not belongs to Customer");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found"));
         Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("user not found"));
@@ -185,8 +196,8 @@ public class CustomerService {
         }
     }
 
-    public boolean checkAddressId(Long id) {
-        return addressRepo.existsById(id);
-    }
+//    public boolean checkAddressId(Long id) {
+//        return addressRepo.existsById(id);
+//    }
 
 }

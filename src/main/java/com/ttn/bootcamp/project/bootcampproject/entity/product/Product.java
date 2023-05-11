@@ -1,13 +1,14 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ttn.bootcamp.project.bootcampproject.Audit;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
-public class Product {
+public class Product extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name="userid",sequenceName ="product",initialValue = 1,allocationSize = 1)

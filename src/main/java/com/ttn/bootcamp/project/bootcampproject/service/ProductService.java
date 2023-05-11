@@ -2,13 +2,16 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductUpdateDTO;
+import com.ttn.bootcamp.project.bootcampproject.dto.ProductVariationDTO;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
 import com.ttn.bootcamp.project.bootcampproject.entity.product.Product;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.ProductVariation;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.CategoryRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.ProductRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.ProductVariationRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,9 +33,12 @@ public class ProductService {
     ProductRepo productRepo;
     @Autowired
     EmailService emailService;
+    @Autowired
+    ProductVariationRepo productVariationRepo;
 
     @Value("${admin.email}")
     String adminEmail;
+
 
     public void addProduct(ProductDTO productDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -44,22 +50,44 @@ public class ProductService {
             throw new GenericMessageException("This category is not a leaf node category");
         }
 
-        Product product = new Product();
-        product.setBrand(productDTO.getBrand());
-        product.setCancellable(productDTO.isCancelable());;
-        product.setName(productDTO.getProductName());
-        product.setDescription(productDTO.getDescription());
-        product.setSeller(seller);
-        product.setReturnable(productDTO.isReturnable());
-        product.setCategory(category);
+        if(!productRepo.existsByNameAndBrandAndCategoryAndSeller(productDTO.getProductName(), productDTO.getBrand(),category,seller)) {
+            Product product = new Product();
+            product.setBrand(productDTO.getBrand());
+            product.setCancellable(productDTO.isCancelable());
+            ;
+            product.setName(productDTO.getProductName());
+            product.setDescription(productDTO.getDescription());
+            product.setSeller(seller);
+            product.setReturnable(productDTO.isReturnable());
+            product.setCategory(category);
 
-        productRepo.save(product);
-        emailService.sendMail(adminEmail,"Product Added","Product is added by this seller "+seller.getEmail()+"and the product information is"+product);
+            productRepo.save(product);
+            emailService.sendMail(adminEmail, "Product Added", "Product is added by this seller " + seller.getEmail() + "and the product information is" + product);
+        }
+        throw new GenericMessageException("Product is already exists!!");
     }
 
-//    public void addProductVariation(){
-//
-//    }
+
+    public void addProductVariation(ProductVariationDTO productVariationDTO){
+        Product product = productRepo.findById(productVariationDTO.getProductId())
+                .orElseThrow(()->new GenericMessageException("Product id not found!!"));
+        if(productVariationDTO.getQuantity()<0){
+            throw new GenericMessageException("Quantity can't be less than 0");
+        }
+
+        if(productVariationDTO.getPrice()<0){
+            throw new GenericMessageException("Price can't be less than 0");
+        }
+        if(product.isDeleted() && !product.isActive()){
+            throw new GenericMessageException("Product is not activated!!");
+        }
+        ProductVariation productVariation = new ProductVariation();
+        productVariation.setProduct(product);
+        productVariation.setMetaData(productVariation.getMetaData());
+        productVariation.setQuantityAvailable(productVariationDTO.getQuantity());
+        productVariation.setPrice(productVariationDTO.getPrice());
+        productVariationRepo.save(productVariation);
+    }
 
     public Product viewProduct(Long productId){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -120,7 +148,6 @@ public class ProductService {
         if(product.isDeleted()){
             throw new GenericMessageException("This product is not available or deleted!!");
         }
-
 
     }
 

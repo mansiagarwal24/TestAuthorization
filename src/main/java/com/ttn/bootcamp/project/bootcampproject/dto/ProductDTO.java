@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
+import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ public class ProductDTO {
     private boolean isReturnable;
     @NotNull
     private Long categoryId;
+
 
 
 
