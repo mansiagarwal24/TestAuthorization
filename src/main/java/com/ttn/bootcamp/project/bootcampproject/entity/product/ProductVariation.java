@@ -3,6 +3,8 @@ package com.ttn.bootcamp.project.bootcampproject.entity.product;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Map;
+
 @Entity
 @Data
 public class ProductVariation {
@@ -13,8 +15,9 @@ public class ProductVariation {
     private int quantityAvailable;
     private Long price;
     private boolean isActive;
-    @Column(columnDefinition = "json")
-    private String metaData;
+
+//    @Column(columnDefinition = "json")
+//    private Map<String,String> metaData;
 //    //image
 //    private String primaryImageName;
 

@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,8 +55,16 @@ public class CategoryService {
         return metaDataList;
     }
 
-    public void addCategory(String categoryName,Long parentId){
+    public Category addCategory(String categoryName,Long parentId){
+        if(categoryRepo.existsByName(categoryName)){
+            throw new GenericMessageException("Category Name already exists!!");
+        }
         Category category = new Category();
+        if(parentId == 0 ){
+            category.setName(categoryName);
+            categoryRepo.save(category);
+            return category;
+        }
         if(parentId!=null){
             Category parentCategory = categoryRepo.findById(parentId).orElseThrow(()->new ResourcesNotFoundException("Id not exist!!"));
             category.setParentCategory(parentCategory);
@@ -81,6 +86,7 @@ public class CategoryService {
         }
         category.setName(categoryName);
         categoryRepo.save(category);
+        return category;
     }
 
     public CategoryResponseDTO  viewCategory(Long categoryId){

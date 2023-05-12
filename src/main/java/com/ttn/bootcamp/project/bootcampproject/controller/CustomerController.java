@@ -8,6 +8,7 @@ import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
 import com.ttn.bootcamp.project.bootcampproject.service.CustomerService;
 import com.ttn.bootcamp.project.bootcampproject.service.I18Service;
+import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/customer")
 public class CustomerController {
@@ -23,6 +26,8 @@ public class CustomerController {
     CustomerService customerService;
     @Autowired
     CategoryService categoryService;
+    @Autowired
+    ProductService productService;
     @Autowired
     I18Service i18Service;
 
@@ -38,7 +43,7 @@ public class CustomerController {
     }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateCustomerProfile(@Valid @RequestBody CustomerUpdateDTO customerUpdateDTO){
+    public ResponseEntity<?> updateCustomerProfile(@Valid @ModelAttribute CustomerUpdateDTO customerUpdateDTO) throws IOException {
         customerService.updateProfile(customerUpdateDTO);
         return new ResponseEntity<>("Profile updated Successfully!!",HttpStatus.OK);
     }
@@ -78,5 +83,17 @@ public class CustomerController {
     @GetMapping("/viewCategory")
     public ResponseEntity<?> viewCategoryById(@RequestParam Long id){
         return new ResponseEntity<>(categoryService.viewCategoryForCustomer(id),HttpStatus.OK);
+    }
+
+
+    //PRODUCT API
+    @GetMapping("/viewProduct")
+    public ResponseEntity<?> viewProductById(@RequestParam Long id){
+        return new ResponseEntity<>(productService.viewProductByCustomer(id),HttpStatus.OK);
+    }
+
+    @GetMapping("/viewAllProduct")
+    public ResponseEntity<?> viewAllProducts(@RequestParam Long id){
+        return new ResponseEntity<>(productService.viewAllProductByCustomer(id),HttpStatus.OK);
     }
 }

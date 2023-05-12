@@ -1,13 +1,17 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttn.bootcamp.project.bootcampproject.Audit;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Entity
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Product extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -27,6 +31,10 @@ public class Product extends Audit {
     @ManyToOne
     @JoinColumn(name="categoryId")
     private Category category;
+
+    @OneToMany
+    @JsonIgnore
+    private List<ProductVariation> productVariation;
 
 
 }

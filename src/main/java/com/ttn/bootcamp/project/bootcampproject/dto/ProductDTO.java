@@ -18,7 +18,4 @@ public class ProductDTO {
     @NotNull
     private Long categoryId;
 
-
-
-
 }

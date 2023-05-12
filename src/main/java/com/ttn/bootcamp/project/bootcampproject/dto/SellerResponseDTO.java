@@ -13,4 +13,5 @@ public class SellerResponseDTO {
     private boolean isActive;
     private Address companyAddress;
     private String companyContact;
+    private String image;
 }

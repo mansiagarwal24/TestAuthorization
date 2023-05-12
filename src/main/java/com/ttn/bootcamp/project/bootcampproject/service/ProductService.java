@@ -41,6 +41,9 @@ public class ProductService {
 
 
     public void addProduct(ProductDTO productDTO){
+        if(Objects.isNull(productDTO)){
+            throw new GenericMessageException("Invalid Input parameter!!");
+        }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("Seller not found!!"));
 
@@ -50,11 +53,12 @@ public class ProductService {
             throw new GenericMessageException("This category is not a leaf node category");
         }
 
-        if(!productRepo.existsByNameAndBrandAndCategoryAndSeller(productDTO.getProductName(), productDTO.getBrand(),category,seller)) {
+        if(productRepo.existsByBrandAndCategoryAndSeller( productDTO.getBrand(),category,seller)) {
+            throw new GenericMessageException("Product is already exists!!");
+        }
             Product product = new Product();
             product.setBrand(productDTO.getBrand());
             product.setCancellable(productDTO.isCancelable());
-            ;
             product.setName(productDTO.getProductName());
             product.setDescription(productDTO.getDescription());
             product.setSeller(seller);
@@ -62,9 +66,7 @@ public class ProductService {
             product.setCategory(category);
 
             productRepo.save(product);
-            emailService.sendMail(adminEmail, "Product Added", "Product is added by this seller " + seller.getEmail() + "and the product information is" + product);
-        }
-        throw new GenericMessageException("Product is already exists!!");
+            emailService.sendMail(adminEmail, " New Product Added", "Product is added by this  " + seller.getEmail() + " Seller and the product Id is" + product.getId());
     }
 
 
@@ -83,13 +85,13 @@ public class ProductService {
         }
         ProductVariation productVariation = new ProductVariation();
         productVariation.setProduct(product);
-        productVariation.setMetaData(productVariation.getMetaData());
+//        productVariation.setMetaData(productVariation.getMetaData());
         productVariation.setQuantityAvailable(productVariationDTO.getQuantity());
         productVariation.setPrice(productVariationDTO.getPrice());
         productVariationRepo.save(productVariation);
     }
 
-    public Product viewProduct(Long productId){
+    public ProductDTO viewProduct(Long productId){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("User not found!!"));
         Product product = productRepo.findById(productId).orElseThrow(()-> new ResourcesNotFoundException("Id doesn't exist!!"));
@@ -99,20 +101,26 @@ public class ProductService {
         if(!Objects.equals(seller.getUserId(), product.getSeller().getUserId())){
             throw new GenericMessageException("You have not created any product!!");
         }
-        return product;
+        ProductDTO productDTO = new ProductDTO();
+        productDTO.setProductName(product.getName());
+        productDTO.setBrand(product.getBrand());
+        productDTO.setReturnable(product.isReturnable());
+        productDTO.setCancelable(product.isCancellable());
+        productDTO.setCategoryId(product.getCategory().getId());
+        return productDTO;
     }
 
     public List<Product> viewAllProducts(){
+        List<Product> productList = productRepo.findAll();
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-       Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("User not found!!"));
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("User not found!!"));
 
-        List<Product> productList = new ArrayList<>();
-        for(Product products: productList){
-            if(products.getSeller().getEmail()==email){
-                productList.add(products);
-            }
-            throw new GenericMessageException("you have not created any product!!");
-        }
+//        for(Product product: productList){
+//            if(Objects.equals(product.getSeller().getEmail(),email)){
+//                productList.add(product);
+//            }
+//            throw new GenericMessageException("you have not created any product!!");
+//        }
         return productList;
     }
 
@@ -142,12 +150,39 @@ public class ProductService {
         productRepo.save(product);
     }
 
-    public void viewProductByCustomter(Long productId){
+    public Product viewProductByCustomer(Long productId){
         Product product = productRepo.findById(productId).orElseThrow(()->new ResourcesNotFoundException("No product found for this id!!"));
 
-        if(product.isDeleted()){
+        if(product.isDeleted() && !product.isActive()){
             throw new GenericMessageException("This product is not available or deleted!!");
         }
+        return product;
+    }
+
+    public List<ProductDTO> viewAllProductByCustomer(Long id){
+        Category category = categoryRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("Category Id not found!! "));
+
+        if(categoryRepo.existsByParentCategory(category)){
+            throw new GenericMessageException("This category is not a leaf node category");
+        }
+
+//        if(!productVariationRepo.existsByProduct(product)){
+//            throw new GenericMessageException("there is no product variation for this category ");
+//        }
+        List<Product> productList=productRepo.findByCategory(category);
+        List<ProductDTO> productDTOList=new ArrayList<>();
+
+        for(Product product: productList){
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setProductName(product.getName());
+            productDTO.setBrand(product.getBrand());
+            productDTO.setReturnable(product.isReturnable());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setCategoryId(product.getCategory().getId());
+            productDTO.setCancelable(product.isCancellable());
+            productDTOList.add(productDTO);
+        }
+        return productDTOList;
 
     }
 

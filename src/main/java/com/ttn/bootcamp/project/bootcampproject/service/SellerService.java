@@ -9,13 +9,17 @@ import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Objects;
@@ -35,6 +39,8 @@ public class SellerService {
     PasswordEncoder encoder;
     @Autowired
     I18Service i18Service;
+//    @Autowired
+//    ImageService imageService;
 
 
 
@@ -94,11 +100,14 @@ public class SellerService {
         sellerResponseDTO.setId(seller.getUserId());
         sellerResponseDTO.setCompanyName(seller.getCompanyName());
         sellerResponseDTO.setActive(seller.isActive());
+        sellerResponseDTO.setImage(seller.getProfileImage());
         return new ResponseEntity<>(sellerResponseDTO,HttpStatus.OK);
 
     }
 
-    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) {
+    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
+    @Transactional
+    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) throws IOException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
 
@@ -117,6 +126,10 @@ public class SellerService {
         if(sellerUpdateDTO.getCompanyName()!=null){
             seller.setCompanyName(sellerUpdateDTO.getCompanyName());
         }
+
+        seller.setProfileImage(basePath+seller.getUserId()+".jpg");
+        sellerRepo.save(seller);
+        sellerUpdateDTO.getImage().transferTo(new File(basePath+sellerUpdateDTO.getImage().getOriginalFilename()));
         sellerRepo.save(seller);
 
         return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);

@@ -18,7 +18,7 @@ public class OrderProduct extends Audit {
 
     @ManyToOne
     @JoinColumn(name="orderId")
-    private Order order;
+    private Orders orders;
 
     @OneToOne
     @JoinColumn(name="productVariation")

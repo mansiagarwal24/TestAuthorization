@@ -16,7 +16,8 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString@Inheritance(strategy = InheritanceType.JOINED)
+@ToString
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "userid")
@@ -30,14 +31,15 @@ public class User extends Audit {
     private boolean isDeleted=false,isActive=false,isExpired=false,isLocked = false;
     private int invalidAttemptCount;
     private LocalDate passwordUpdateDate;
-    private String filePath;
-    private String token;
+    private String profileImage;
+    // TODO: ideally this should have a separate table. We will refactor it. This is s tech debt.
+    private String registrationToken;
     private LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> role;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    private Token accessToken;
+//    @OneToOne(fetch = FetchType.EAGER)
+//    private Token accessToken;
 
 }

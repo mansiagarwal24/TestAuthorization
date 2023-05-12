@@ -6,10 +6,11 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
-public class Order extends Audit {
+public class Orders extends Audit {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @SequenceGenerator(name="userid",sequenceName ="order",initialValue = 1,allocationSize = 1)

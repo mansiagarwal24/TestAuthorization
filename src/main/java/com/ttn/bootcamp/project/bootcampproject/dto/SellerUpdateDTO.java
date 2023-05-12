@@ -2,6 +2,7 @@ package com.ttn.bootcamp.project.bootcampproject.dto;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class SellerUpdateDTO {
@@ -11,4 +12,5 @@ public class SellerUpdateDTO {
     private String companyContact;
     private String companyName;
     private String middleName;
+    private MultipartFile image;
 }

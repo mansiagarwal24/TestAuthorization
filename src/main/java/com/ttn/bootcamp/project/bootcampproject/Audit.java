@@ -17,7 +17,7 @@ import java.util.Date;
 @EqualsAndHashCode
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Audit<T> {
+public abstract class Audit<U> {
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
     @JsonIgnore
@@ -29,12 +29,12 @@ public abstract class Audit<T> {
     protected Date lastUpdated;
 
     @CreatedBy
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     protected User createdBy;
 
     @LastModifiedBy
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     protected User modifiedBy;
 }

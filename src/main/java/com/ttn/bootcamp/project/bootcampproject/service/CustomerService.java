@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -40,8 +42,8 @@ public class CustomerService {
 
     @Autowired
     I18Service i18Service;
-    @Autowired
-    ImageService imageService;
+//    @Autowired
+//    ImageService imageService;
     @Value("${path}")
     String path;
 
@@ -74,7 +76,7 @@ public class CustomerService {
         Role role = roleRepo.findByAuthority(Authority.CUSTOMER).orElse(null);
         customer.setRole(Collections.singletonList(role));
         String uuid = String.valueOf(UUID.randomUUID());
-        customer.setToken(uuid);
+        customer.setRegistrationToken(uuid);
 
         userRepo.save(customer);
         addressRepo.save(address);
@@ -91,15 +93,16 @@ public class CustomerService {
         customerResponseDTO.setEmail(customer.getEmail());
         customerResponseDTO.setId(customer.getUserId());
         customerResponseDTO.setActive(customer.isActive());
+        customerResponseDTO.setImage(customer.getProfileImage());
 
         return customerResponseDTO;
 
     }
+    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
 
-    public void updateProfile(CustomerUpdateDTO customerUpdateDTO) {
+    public void updateProfile(CustomerUpdateDTO customerUpdateDTO) throws IOException {
         String email  = SecurityContextHolder.getContext().getAuthentication().getName();
         Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("User doesn't exist!!"));
-
         if(customerUpdateDTO.getFirstName()!=null){
             customer.setFirstName(customerUpdateDTO.getFirstName());
         }
@@ -112,7 +115,9 @@ public class CustomerService {
         if(customerUpdateDTO.getMiddleName()!=null){
             customer.setMiddleName(customerUpdateDTO.getMiddleName());
         }
+        customer.setProfileImage(basePath+customerUpdateDTO.getImage().getOriginalFilename());
         customerRepo.save(customer);
+        customerUpdateDTO.getImage().transferTo(new File(basePath+customerUpdateDTO.getImage().getOriginalFilename()));
     }
 
     public void updatePassword( ResetPasswordDTO resetPasswordDTO) {
@@ -196,8 +201,5 @@ public class CustomerService {
         }
     }
 
-//    public boolean checkAddressId(Long id) {
-//        return addressRepo.existsById(id);
-//    }
 
 }

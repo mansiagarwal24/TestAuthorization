@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.entity.user;
 import com.ttn.bootcamp.project.bootcampproject.Audit;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -18,9 +19,11 @@ public class Address extends Audit {
     private String label; //(Ex. office/home)
 
     @ManyToOne
+    @ToString.Exclude
     private Customer customer;
 
     @OneToOne
+    @ToString.Exclude
     private Seller seller;
 
 

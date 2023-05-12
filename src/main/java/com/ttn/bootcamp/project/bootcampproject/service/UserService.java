@@ -10,6 +10,7 @@ import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.UserRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import io.micrometer.common.util.StringUtils;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -54,6 +56,18 @@ public class UserService {
         if (user.isLocked()) {
             return new ResponseEntity<>("Your account is locked. please contact to admin", HttpStatus.UNAUTHORIZED);
         }
+        if (user.isExpired()) {
+            return new ResponseEntity<>("Your account is expired", HttpStatus.UNAUTHORIZED);
+        }
+        if (user.isDeleted()) {
+            return new ResponseEntity<>("Your account is deleted.", HttpStatus.UNAUTHORIZED);
+        }
+
+//        Token activeToken=tokenRepo.findByUser(user);
+//        if(!Objects.isNull(activeToken)){
+//            tokenRepo.delete(activeToken);
+//        }
+
 //        log.info(user.getEmail());
         Authentication authentication;
         try {
@@ -129,7 +143,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> activate(String token) {
-        User user =userRepo.findByToken(token).orElseThrow(()-> new RuntimeException("Invalid Token!!"));
+        User user =userRepo.findByRegistrationToken(token).orElseThrow(()-> new RuntimeException("Invalid Token!!"));
         if(user.getExpiryTime().isBefore(LocalDateTime.now())){
             return new ResponseEntity<>("your token is expired!! please go to resend email activation link!!",HttpStatus.BAD_REQUEST);
         }
@@ -146,9 +160,16 @@ public class UserService {
             User user = userRepo.findByEmail(email).get();
             user.setExpiryTime(LocalDateTime.now().plusMinutes(15));
             String token  = UUID.randomUUID().toString();
+            user.setRegistrationToken(token);
+            userRepo.save(user);
             emailService.sendMail(email, "Activation Link ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + token);
         }
         throw new ResourcesNotFoundException("Email not found!!");
+    }
+
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    public Optional<User> findByEmail(String email){
+        return userRepo.findByEmail(email);
     }
 }
 

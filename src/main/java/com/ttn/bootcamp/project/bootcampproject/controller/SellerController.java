@@ -12,6 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/seller")
@@ -34,7 +37,7 @@ public class SellerController {
     }
 
     @PatchMapping("/updateProfile")
-    public ResponseEntity<?> updateSellerProfile(@Valid @RequestBody SellerUpdateDTO sellerUpdateDTO){
+    public ResponseEntity<?> updateSellerProfile(@Valid @ModelAttribute SellerUpdateDTO sellerUpdateDTO) throws IOException {
         return sellerService.updateProfile(sellerUpdateDTO);
     }
 
@@ -66,11 +69,11 @@ public class SellerController {
 
     //PRODUCT API
 
-//    @PostMapping("/addProduct")
-//    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO){
-//        productService.addProduct(productDTO);
-//        return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
-//    }
+    @PostMapping("/addProduct")
+    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductDTO productDTO){
+        productService.addProduct(productDTO);
+        return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
+    }
     @PostMapping("/addProductVariation")
     public ResponseEntity<?> addProduct(@Valid @RequestBody ProductVariationDTO productVariationDTO){
         productService.addProductVariation(productVariationDTO);
