@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
+import com.ttn.bootcamp.project.bootcampproject.converter.HashMapConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -16,8 +17,8 @@ public class ProductVariation {
     private Long price;
     private boolean isActive;
 
-//    @Column(columnDefinition = "json")
-//    private Map<String,String> metaData;
+    @Convert(converter = HashMapConverter.class)
+    private Map<String,String> metaData;
 //    //image
 //    private String primaryImageName;
 

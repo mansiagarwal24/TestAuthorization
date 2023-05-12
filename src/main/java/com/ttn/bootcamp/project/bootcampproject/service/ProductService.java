@@ -3,24 +3,17 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductUpdateDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.ProductVariationDTO;
-import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
-import com.ttn.bootcamp.project.bootcampproject.entity.product.Product;
-import com.ttn.bootcamp.project.bootcampproject.entity.product.ProductVariation;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
-import com.ttn.bootcamp.project.bootcampproject.repository.CategoryRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.ProductRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.ProductVariationRepo;
-import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
+import com.ttn.bootcamp.project.bootcampproject.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -35,6 +28,10 @@ public class ProductService {
     EmailService emailService;
     @Autowired
     ProductVariationRepo productVariationRepo;
+    @Autowired
+    CategoryMetadataFieldRepo categoryMetadataFieldRepo;
+    @Autowired
+    MetaDataValuesRepo metaDataValuesRepo;
 
     @Value("${admin.email}")
     String adminEmail;
@@ -83,9 +80,33 @@ public class ProductService {
         if(product.isDeleted() && !product.isActive()){
             throw new GenericMessageException("Product is not activated!!");
         }
+
+        Map<String,String> metadata=productVariationDTO.getMetadataValues();
+        Map<String,String> data = new HashMap<>();
+        for(Map.Entry<String,String> map: metadata.entrySet()){
+            if(!categoryMetadataFieldRepo.existsByFieldName(map.getKey())){
+                throw new GenericMessageException("Field Values doesn't exist!!");
+            }
+            CategoryMetadataField categoryMetadataField = categoryMetadataFieldRepo.findByFieldName(map.getKey());
+
+            if(!categoryMetadataFieldRepo.existsByCategoryIdAndCategoryMetadataId(product.getCategory().getId(),categoryMetadataField.getId())){
+                throw new GenericMessageException("Field Values doesn't exist!!");
+            }
+            CategoryMetadataFieldValues categoryMetadataFieldValues = categoryMetadataFieldRepo.findByCategoryIdAndCategoryMetadataFieldId(
+                    product.getCategory().getId(),categoryMetadataField.getId());
+            String[] strings=categoryMetadataFieldValues.getValue().split(",");
+
+            for(String s:strings){
+                if(s.equals(map.getValue())){
+                    data.put(map.getKey(),s);
+                    break;
+                }
+            }
+
+        }
         ProductVariation productVariation = new ProductVariation();
         productVariation.setProduct(product);
-//        productVariation.setMetaData(productVariation.getMetaData());
+        productVariation.setMetaData(data);
         productVariation.setQuantityAvailable(productVariationDTO.getQuantity());
         productVariation.setPrice(productVariationDTO.getPrice());
         productVariationRepo.save(productVariation);
@@ -110,10 +131,22 @@ public class ProductService {
         return productDTO;
     }
 
-    public List<Product> viewAllProducts(){
-        List<Product> productList = productRepo.findAll();
+    public List<ProductDTO> viewAllProducts(){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()->new ResourcesNotFoundException("User not found!!"));
+        List<Product> products = productRepo.findAllBySellerId(seller.getUserId());
+        List<ProductDTO>productList=new ArrayList<>();
+        for(Product product:products){
+            ProductDTO productDTO = new ProductDTO();
+            productDTO.setProductName(product.getName());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setBrand(product.getBrand());
+            productDTO.setCategoryId(product.getCategory().getId());
+            productDTO.setCancelable(product.isCancellable());
+            productList.add(productDTO);
+        }
+        return productList;
+
 
 //        for(Product product: productList){
 //            if(Objects.equals(product.getSeller().getEmail(),email)){
@@ -121,7 +154,6 @@ public class ProductService {
 //            }
 //            throw new GenericMessageException("you have not created any product!!");
 //        }
-        return productList;
     }
 
     public void deleteProduct(Long productId){
