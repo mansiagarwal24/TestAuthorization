@@ -9,6 +9,7 @@ import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,12 +62,6 @@ public class SellerController {
 
 
 
-
-
-
-
-
-
     //PRODUCT API
 
     @PostMapping("/addProduct")
@@ -75,9 +70,18 @@ public class SellerController {
         return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
     }
     @PostMapping("/addProductVariation")
-    public ResponseEntity<?> addProduct(@Valid @RequestBody ProductVariationDTO productVariationDTO){
+    public ResponseEntity<?> addProductVariation(@Valid @RequestBody ProductVariationDTO productVariationDTO){
         productService.addProductVariation(productVariationDTO);
         return new ResponseEntity<>("Product Variation added Successfully!!",HttpStatus.OK);
+    }
+
+    @GetMapping("/viewProductVariation")
+    public ResponseEntity<?> viewProductVariation(@RequestParam Long id){
+        return new ResponseEntity<>(productService.viewProductVariation(id),HttpStatus.OK);
+    }
+    @GetMapping("/viewAllProductVariation")
+    public ResponseEntity<?> viewAllProductVariation(@RequestParam int offSet, @RequestParam int pageSize, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
+        return new ResponseEntity<>(productService.viewAllProductVariations(offSet,pageSize,orderBy,sortBy),HttpStatus.OK);
     }
 
     @GetMapping("/viewProduct")
@@ -86,8 +90,8 @@ public class SellerController {
     }
 
     @GetMapping("/viewAllProduct")
-    public ResponseEntity<?> viewAllProduct(){
-        return new ResponseEntity<>(productService.viewAllProducts(),HttpStatus.OK);
+    public ResponseEntity<?> viewAllProduct(@RequestParam int offSet, @RequestParam int pageSize, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
+        return new ResponseEntity<>(productService.viewAllProducts(offSet,pageSize,orderBy,sortBy),HttpStatus.OK);
     }
 
     @DeleteMapping("/deleteProduct")
@@ -101,5 +105,12 @@ public class SellerController {
         productService.updateProduct(id,productUpdateDTO);
         return new ResponseEntity<>("Product updated Successfully!!",HttpStatus.OK);
     }
+
+    @PutMapping("/updateProductVariation")
+    public ResponseEntity<?> updateProductVariation(@RequestParam Long id,@RequestBody ProductVariationDTO productVariationDTO) throws IOException {
+        productService.updateProductVariation(id,productVariationDTO);
+        return new ResponseEntity<>("Product Variation added Successfully!!",HttpStatus.OK);
+    }
+
 
 }

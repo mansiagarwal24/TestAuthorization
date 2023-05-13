@@ -63,10 +63,10 @@ public class UserService {
             return new ResponseEntity<>("Your account is deleted.", HttpStatus.UNAUTHORIZED);
         }
 
-//        Token activeToken=tokenRepo.findByUser(user);
-//        if(!Objects.isNull(activeToken)){
-//            tokenRepo.delete(activeToken);
-//        }
+        Token activeToken=tokenRepo.findByEmail(user.getEmail());
+        if(!Objects.isNull(activeToken)){
+            tokenRepo.delete(activeToken);
+        }
 
 //        log.info(user.getEmail());
         Authentication authentication;

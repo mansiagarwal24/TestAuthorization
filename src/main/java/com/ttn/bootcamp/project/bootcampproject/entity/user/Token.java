@@ -16,6 +16,6 @@ public class Token extends Audit {
     private String token;
     private boolean isDelete=false;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     private User user;
 }

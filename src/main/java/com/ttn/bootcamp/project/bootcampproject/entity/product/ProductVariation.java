@@ -15,18 +15,16 @@ public class ProductVariation {
     private Long id;
     private int quantityAvailable;
     private Long price;
-    private boolean isActive;
+    private boolean isActive=true;
 
     @Convert(converter = HashMapConverter.class)
     private Map<String,String> metaData;
-//    //image
-//    private String primaryImageName;
+    //image
+    private String primaryImageName;
 
     @ManyToOne
     @JoinColumn(name="productId")
     private Product product;
-
-
 
 
 }

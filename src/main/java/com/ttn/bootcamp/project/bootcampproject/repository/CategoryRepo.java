@@ -16,5 +16,5 @@ public interface CategoryRepo extends JpaRepository<Category,Long> {
 
     List<Category> findByParentCategory(Category category);
 
-    Category findByName(String name);
+//    Category findByName(String name);
 }

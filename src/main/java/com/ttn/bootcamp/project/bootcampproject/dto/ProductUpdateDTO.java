@@ -8,4 +8,5 @@ public class ProductUpdateDTO {
     private String description;
     private boolean isCancel;
     private boolean isReturn;
+    private String brand;
 }

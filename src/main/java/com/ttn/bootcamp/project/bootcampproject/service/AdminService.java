@@ -89,9 +89,9 @@ public class AdminService {
             if (user.isActive()) {
                 user.setActive(false);
                 user.setLocked(true);
-//                Token token = tokenRepo.findByEmail(user.getEmail()).orElseThrow();
-//                token.setDelete(true);
-//                tokenRepo.save(token);
+                Token token = tokenRepo.findByEmail(user.getEmail());
+                token.setDelete(true);
+                tokenRepo.save(token);
                 userRepo.save(user);
                 emailService.sendMail(user.getEmail(), "Account Activation Status", "Your account has been deactivated.");
                 return true;

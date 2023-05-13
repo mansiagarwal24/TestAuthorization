@@ -17,7 +17,9 @@ public interface ProductRepo extends JpaRepository<Product,Long> {
 //    boolean existsByNameAndSellerId(String name,Long sellerId);
 //    List<Product> findAllByName(String name);
     List<Product> findByCategory(Category category);
-    boolean existsByProductVariation(ProductVariation productVariation);
+//    boolean existsByProductVariation(ProductVariation productVariation);
 
-    List<Product> findAllBySellerId(Long userId);
+    List<Product> findAllBySeller(Seller seller);
+
+    boolean existsBySeller(Seller seller);
 }
