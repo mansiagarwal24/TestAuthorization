@@ -17,4 +17,6 @@ public interface AddressRepo extends JpaRepository<Address,Long> {
 
 
     Optional<Address> findByIdAndCustomer(Long id, Customer customer);
+
+    Optional<Address> findByIdAndSeller(Long id, Seller seller);
 }

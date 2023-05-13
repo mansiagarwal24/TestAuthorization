@@ -40,6 +40,8 @@ public class ProductService {
     @Value("${admin.email}")
     String adminEmail;
 
+    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
+
 
     public void addProduct(ProductDTO productDTO){
         if(Objects.isNull(productDTO)){
@@ -179,7 +181,7 @@ public class ProductService {
         productVariationDTO.setQuantity(productVariation.getQuantityAvailable());
         productVariationDTO.setActive(productVariation.isActive());
         productVariationDTO.setPrice(productVariation.getPrice());
-        productVariationDTO.setMetadataValues(productVariation.getMetaData());//Don't Show values
+        productVariationDTO.setMetadataValues(productVariation.getMetaData());
         productVariationDTO.setProductName(product.getName());
         productVariationDTO.setDescription(product.getDescription());
         productVariationDTO.setBrand(product.getBrand());
@@ -240,7 +242,6 @@ public class ProductService {
         productRepo.save(product);
     }
 
-    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
     public void updateProductVariation(Long id,ProductVariationDTO productVariationDTO) throws IOException {
         if(!productVariationRepo.existsById(id)){
             throw new GenericMessageException("Id not exists!!");
@@ -261,7 +262,7 @@ public class ProductService {
             throw new GenericMessageException("Product is not activated or deleted!!");
         }
 
-        Map<String,String> metadata=productVariation.getMetaData();
+        Map<String,String> metadata=productVariationDTO.getMetadataValues();
         Map<String,String> data = new HashMap<>();
         for(Map.Entry<String,String> map: metadata.entrySet()){
             if(!categoryMetadataFieldRepo.existsByFieldName(map.getKey())){
@@ -311,8 +312,8 @@ public class ProductService {
             throw new GenericMessageException("This category is not a leaf node category");
         }
 
-//        if(!productVariationRepo.existsByProduct(product)){
-//            throw new GenericMessageException("there is no product variation for this category ");
+//        if(!productVariationRepo.existsByProduct()){
+//            throw new GenericMessageException("there is no valid variation for this product category ");
 //        }
 
         List<Product> productList=productRepo.findByCategory(category);
@@ -329,8 +330,29 @@ public class ProductService {
             productDTOList.add(productDTO);
         }
         return productDTOList;
-
     }
+
+
+    public ViewProductDTO viewProductByAdmin(Long id){
+        if(!productRepo.existsById(id)){
+            throw new GenericMessageException("Id not exists!!");
+        }
+
+        Product product = productRepo.findById(id).get();
+        ViewProductDTO viewProductDTO = new ViewProductDTO();
+        viewProductDTO.setCategoryName(product.getCategory().getName());
+        viewProductDTO.setDescription(product.getDescription());
+        viewProductDTO.setProductName(product.getName());
+        viewProductDTO.setBrand(product.getBrand());
+        viewProductDTO.setProductId(product.getId());
+        viewProductDTO.setCategory(product.getCategory());
+        return viewProductDTO;
+    }
+
+//    public ViewProductDTO viewAllProductsByAdmin(int offSet, int size, Sort.Direction orderBy,String sortBy){
+//        List<Product> productList= productRepo.findAll();
+//
+//    }
 
     public boolean activateProduct(Long id){
         Product product=productRepo.findById(id).orElseThrow(()->new ResourcesNotFoundException("No product found for this id!!"));

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductVariationRepo extends JpaRepository<ProductVariation,Long> {
-//    boolean existsByProduct(Product product);
+    boolean existsByProduct(Product product);
 }

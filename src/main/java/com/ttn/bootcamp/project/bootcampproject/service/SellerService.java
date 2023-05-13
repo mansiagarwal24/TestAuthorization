@@ -3,6 +3,7 @@ package com.ttn.bootcamp.project.bootcampproject.service;
 import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.*;
 import com.ttn.bootcamp.project.bootcampproject.enums.Authority;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.AddressRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.RoleRepo;
@@ -42,23 +43,22 @@ public class SellerService {
     I18Service i18Service;
 //    @Autowired
 //    ImageService imageService;
-//    @Value("${basePath}")
-//    String basePath;
+
+    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
 
 
-
-    public ResponseEntity<?> createSeller(SellerDTO sellerDTO){
+    public void createSeller(SellerDTO sellerDTO){
         if(sellerRepo.existsByEmail(sellerDTO.getEmail())){
-            return new ResponseEntity<>("Email is already registered", HttpStatus.BAD_REQUEST);
+            throw new GenericMessageException("Email already exist!!");
         }
         if(!sellerDTO.getPassword().equals(sellerDTO.getConfirmPassword())) {
-            return new ResponseEntity<>("Password doesn't match.", HttpStatus.BAD_REQUEST);
+            throw new GenericMessageException("Password doesn't match!!");
         }
         if(sellerRepo.existsByCompanyName(sellerDTO.getCompanyName())){
-            return new ResponseEntity<>("Company Name is already registered with other seller",HttpStatus.BAD_REQUEST);
+            throw new GenericMessageException("Company Name is already registered with other seller");
         }
         if(sellerRepo.existsByGstNo(sellerDTO.getGstNO())){
-            return new ResponseEntity<>("GST Number is already registered",HttpStatus.BAD_REQUEST);
+            throw new GenericMessageException("GST Number is already registered");
         }
 
         Seller seller=new Seller();
@@ -87,11 +87,9 @@ public class SellerService {
         addressRepo.save(address);
         emailService.sendMail(sellerDTO.getEmail(),"Registration Successful ","Your account has been registered.we will update you once your account has been activated.");
 
-        return new ResponseEntity<>(i18Service.getMsg("seller.register"),HttpStatus.OK);
-
     }
 
-    public ResponseEntity<?> viewProfile() {
+    public SellerResponseDTO viewProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
 
@@ -104,14 +102,14 @@ public class SellerService {
         sellerResponseDTO.setCompanyName(seller.getCompanyName());
         sellerResponseDTO.setActive(seller.isActive());
         sellerResponseDTO.setImage(seller.getProfileImage());
-        return new ResponseEntity<>(sellerResponseDTO,HttpStatus.OK);
+        return sellerResponseDTO;
 
     }
 
-    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
+//    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
 
-    @Transactional
-    public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) throws IOException {
+
+    public void updateProfile(SellerUpdateDTO sellerUpdateDTO) throws IOException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
 
@@ -135,11 +133,9 @@ public class SellerService {
         sellerRepo.save(seller);
         sellerUpdateDTO.getImage().transferTo(new File(basePath+sellerUpdateDTO.getImage().getOriginalFilename()));
         sellerRepo.save(seller);
-
-        return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePassword(ResetPasswordDTO resetPasswordDTO){
+    public void updatePassword(ResetPasswordDTO resetPasswordDTO){
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("user doesn't exist!!"));
         if(Objects.equals(resetPasswordDTO.getPassword(),resetPasswordDTO.getConfirmPassword())){
@@ -147,19 +143,18 @@ public class SellerService {
             seller.setPasswordUpdateDate(LocalDate.now());
             sellerRepo.save(seller);
             emailService.sendMail(seller.getEmail(), "Password Reset","Your password has been updated successfully");
-            return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
         }
-        return new ResponseEntity<>("Password and Confirm Password should be same",HttpStatus.BAD_REQUEST);
+        throw  new GenericMessageException("Password and Confirm Password should be same");
     }
 
-    public ResponseEntity<?> updateAddress(Long id,AddressDTO addressDTO){
-//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-//        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist"));
-//        Address address = addressRepo.findBySeller(seller).orElseThrow(()-> new RuntimeException("User doesn't found!!"));
-        Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found!!"));
-        if(address.getSeller()==null){
-            return new ResponseEntity<>("This id doesn't belong to seller!!",HttpStatus.BAD_REQUEST);
+    public void updateAddress(Long id,AddressDTO addressDTO){
+        if(!addressRepo.existsById(id)){
+            throw new GenericMessageException("Id doesn't exist!!");
         }
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Seller seller = sellerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("User doesn't exist!!"));
+        Address address = addressRepo.findByIdAndSeller(id,seller).orElseThrow(()->new GenericMessageException("This id doesn't belong to seller!!"));
+
         if(addressDTO.getCity()!=null){
             address.setCity(addressDTO.getCity());
         }
@@ -179,7 +174,6 @@ public class SellerService {
             address.setLabel(addressDTO.getLabel());
         }
         addressRepo.save(address);
-        return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
 
     }
 

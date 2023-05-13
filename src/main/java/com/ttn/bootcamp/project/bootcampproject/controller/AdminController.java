@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.annotation.Retention;
 import java.util.List;
 
 @RestController
@@ -121,5 +122,12 @@ public class AdminController {
             return new ResponseEntity<>("Product has been deactivated!!",HttpStatus.OK);
         }
         return new ResponseEntity<>("Product is already deactivated!!",HttpStatus.OK);
+    }
+
+
+    @GetMapping("/viewProductById")
+    public ResponseEntity<?> viewProductById(@RequestParam Long id){
+        return new ResponseEntity<>(productService.viewProductByAdmin(id),HttpStatus.OK);
+
     }
 }

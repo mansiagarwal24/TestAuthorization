@@ -4,6 +4,7 @@ import com.ttn.bootcamp.project.bootcampproject.dto.*;
 import com.ttn.bootcamp.project.bootcampproject.repository.ProductVariationRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
 import com.ttn.bootcamp.project.bootcampproject.service.CategoryService;
+import com.ttn.bootcamp.project.bootcampproject.service.I18Service;
 import com.ttn.bootcamp.project.bootcampproject.service.ProductService;
 import com.ttn.bootcamp.project.bootcampproject.service.SellerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,30 +27,37 @@ public class SellerController {
     CategoryService categoryService;
     @Autowired
     ProductService productService;
+    @Autowired
+    I18Service i18Service;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid SellerDTO sellerDTO){
-        return sellerService.createSeller(sellerDTO);
+        sellerService.createSeller(sellerDTO);
+        return new ResponseEntity<>(i18Service.getMsg("seller.register"),HttpStatus.OK);
     }
 
     @GetMapping("/viewProfile")
     public ResponseEntity<?> viewSellerProfile(){
-        return sellerService.viewProfile();
+        return new ResponseEntity<>(sellerService.viewProfile(),HttpStatus.OK);
     }
 
     @PatchMapping("/updateProfile")
     public ResponseEntity<?> updateSellerProfile(@Valid @ModelAttribute SellerUpdateDTO sellerUpdateDTO) throws IOException {
-        return sellerService.updateProfile(sellerUpdateDTO);
+        sellerService.updateProfile(sellerUpdateDTO);
+        return new ResponseEntity<>("Update Successfully!!",HttpStatus.OK);
     }
 
     @PatchMapping("/updatePassword")
     public ResponseEntity<?> updateSellerPassword(@RequestBody @Valid ResetPasswordDTO resetPasswordDTO){
-        return sellerService.updatePassword(resetPasswordDTO);
+        sellerService.updatePassword(resetPasswordDTO);
+        return new ResponseEntity<>("Password Update Successfully!!",HttpStatus.OK);
     }
 
     @PatchMapping("/updateAddress")
     public ResponseEntity<?> updateSellerAddress(@RequestParam Long id,@RequestBody AddressDTO addressDTO){
-        return sellerService.updateAddress(id,addressDTO);
+        sellerService.updateAddress(id,addressDTO);
+        return new ResponseEntity<>("Address Updated Successfully!!",HttpStatus.OK);
+
     }
 
     //CATEGORY API

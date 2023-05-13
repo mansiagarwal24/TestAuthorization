@@ -29,10 +29,11 @@ public class Product extends Audit {
     private Seller seller;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name="categoryId")
     private Category category;
 
-    @OneToMany
+    @OneToMany(mappedBy = "product")
     @JsonIgnore
     private List<ProductVariation> productVariation;
 

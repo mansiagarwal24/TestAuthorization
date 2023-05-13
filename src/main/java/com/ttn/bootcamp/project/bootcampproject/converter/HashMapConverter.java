@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
-
 public class HashMapConverter implements AttributeConverter<Map<String, Object>, String> {
     @Autowired
     ObjectMapper objectMapper;
