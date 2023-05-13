@@ -44,8 +44,8 @@ public class CustomerService {
     I18Service i18Service;
 //    @Autowired
 //    ImageService imageService;
-    @Value("${path}")
-    String path;
+//    @Value("${basePath}")
+//    String basePath;
 
 
     public void createCustomer(CustomerDTO customerDTO) {
@@ -133,10 +133,12 @@ public class CustomerService {
     }
 
     public void updateAddress(Long id ,AddressDTO addressDTO){
-        if(!customerRepo.existsById(id)){
-            throw new GenericMessageException("This id doesn't belong to customer!!");
+        if(!addressRepo.existsById(id)){
+            throw new GenericMessageException("Id doesn't exist!!");
         }
-        Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found!!"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("User doesn't exist!!"));
+        Address address = addressRepo.findByIdAndCustomer(id,customer).orElseThrow(()->new GenericMessageException("This id doesn't belong to customer!!"));
             if (addressDTO.getCity() != null) {
                 address.setCity(addressDTO.getCity());
             }
@@ -180,25 +182,17 @@ public class CustomerService {
         return customer.getAddressList();
 
     }
-//    public String uploadCustomerProfileImage(MultipartFile file) throws IOException {
-//        String email=SecurityContextHolder.getContext().getAuthentication().getName();
-//        Customer customer=customerRepo.findByEmail(email).orElseThrow(()-> new EntityNotFoundException("Customer not found."));
-//        customer.setFilePath(path+"/"+file.getOriginalFilename());
-//        customerRepo.save(customer);
-//        file.transferTo(new File(path+"/"+file.getOriginalFilename()));
-//        return "Image Uploaded";
-//    }
+
 
     public void deleteAddress(Long id){
-        if(!customerRepo.existsById(id)){
-            throw new GenericMessageException("This Id does not belongs to Customer");
+        if(!addressRepo.existsById(id)){
+            throw new GenericMessageException("Id not exist!!");
         }
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Address address = addressRepo.findById(id).orElseThrow(()-> new ResourcesNotFoundException("Address not found"));
         Customer customer = customerRepo.findByEmail(email).orElseThrow(()-> new ResourcesNotFoundException("user not found"));
-        if(addressRepo.existsByCustomer(customer)) {
-            addressRepo.delete(address);
-        }
+        Address address = addressRepo.findByIdAndCustomer(id,customer).orElseThrow(()->new GenericMessageException("This id doesn't belong to customer!!"));
+        address.setDelete(true);
+        addressRepo.save(address);
     }
 
 

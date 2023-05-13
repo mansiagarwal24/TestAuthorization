@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject;
+package com.ttn.bootcamp.project.bootcampproject.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

@@ -16,4 +16,5 @@ public interface AddressRepo extends JpaRepository<Address,Long> {
     boolean existsByCustomer(Customer customer);
 
 
+    Optional<Address> findByIdAndCustomer(Long id, Customer customer);
 }

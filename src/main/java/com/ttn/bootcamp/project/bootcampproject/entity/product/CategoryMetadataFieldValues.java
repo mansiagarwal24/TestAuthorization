@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ttn.bootcamp.project.bootcampproject.Audit;
 import com.ttn.bootcamp.project.bootcampproject.entity.compositekeys.CategoryMetaDataId;
-import com.ttn.bootcamp.project.bootcampproject.StringListConverter;
+import com.ttn.bootcamp.project.bootcampproject.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 

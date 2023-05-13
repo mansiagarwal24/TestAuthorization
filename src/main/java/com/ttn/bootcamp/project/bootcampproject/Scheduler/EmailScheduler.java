@@ -1,4 +1,4 @@
-package com.ttn.bootcamp.project.bootcampproject;
+package com.ttn.bootcamp.project.bootcampproject.Scheduler;
 
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
@@ -10,18 +10,20 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class Scheduler {
+public class EmailScheduler {
     @Autowired
     CustomerRepo customerRepo;
     @Autowired
     EmailService emailService;
 
-    @Scheduled(cron = "0 15 10 15 * ?")
+    @Scheduled(cron = "0 12 * * * ?")
     public void sendEmailToUser(){
         List<Customer> customerList = customerRepo.findAll();
         for(Customer customer:customerList){
-            emailService.sendMail(customer.getEmail(), "Account Information",
-                    "This is an auto-generated email. This is to inform you that to update your password in every 45 days to secure your account.");
+            emailService.sendMail(customer.getEmail(), "Special Offer",
+                    "It’s the end-of-season SALE !!\n" +
+                            "Enjoy incredible discounts of up to 40% on our top styles.\n" +
+                            "Don’t miss out, shop now!!");
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
+import com.ttn.bootcamp.project.bootcampproject.entity.product.Category;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.CategoryMetadataFieldValues;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
@@ -14,5 +17,9 @@ public class ViewProductVariationDTO {
     private String productName;
     private String brand;
     private String description;
+    private String categoryName;
+    private Long categoryId;
+    private List<CategoryMetadataFieldValues> categoryMetadataValues;
+//    private Category category;
 
 }

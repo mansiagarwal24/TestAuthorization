@@ -107,9 +107,9 @@ public class SellerController {
     }
 
     @PutMapping("/updateProductVariation")
-    public ResponseEntity<?> updateProductVariation(@RequestParam Long id,@RequestBody ProductVariationDTO productVariationDTO) throws IOException {
+    public ResponseEntity<?> updateProductVariation(@RequestParam Long id,@ModelAttribute ProductVariationDTO productVariationDTO) throws IOException {
         productService.updateProductVariation(id,productVariationDTO);
-        return new ResponseEntity<>("Product Variation added Successfully!!",HttpStatus.OK);
+        return new ResponseEntity<>("Product Variation updated Successfully!!",HttpStatus.OK);
     }
 
 

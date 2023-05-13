@@ -131,6 +131,7 @@ public class ProductService {
         productDTO.setReturnable(product.isReturnable());
         productDTO.setCancelable(product.isCancellable());
         productDTO.setCategoryId(product.getCategory().getId());
+        productDTO.setDescription(product.getDescription());
         return productDTO;
     }
 
@@ -153,14 +154,6 @@ public class ProductService {
             }
         }
         return productList;
-
-
-//        for(Product product: productList){
-//            if(Objects.equals(product.getSeller().getEmail(),email)){
-//                productList.add(product);
-//            }
-//            throw new GenericMessageException("you have not created any product!!");
-//        }
     }
 
     public ViewProductVariationDTO viewProductVariation(Long id){
@@ -186,10 +179,14 @@ public class ProductService {
         productVariationDTO.setQuantity(productVariation.getQuantityAvailable());
         productVariationDTO.setActive(productVariation.isActive());
         productVariationDTO.setPrice(productVariation.getPrice());
-        productVariationDTO.setMetadataValues(productVariation.getMetaData());
+        productVariationDTO.setMetadataValues(productVariation.getMetaData());//Don't Show values
         productVariationDTO.setProductName(product.getName());
         productVariationDTO.setDescription(product.getDescription());
         productVariationDTO.setBrand(product.getBrand());
+        productVariationDTO.setCategoryId(productVariation.getProduct().getCategory().getId());
+        productVariationDTO.setCategoryName(productVariation.getProduct().getCategory().getName());
+        productVariationDTO.setCategoryMetadataValues(productVariation.getProduct().getCategory().getCategoryMetadataFieldValues());
+
         return productVariationDTO;
     }
 

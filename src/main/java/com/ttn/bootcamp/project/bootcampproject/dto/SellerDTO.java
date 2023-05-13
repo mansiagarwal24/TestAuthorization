@@ -27,9 +27,11 @@ public class SellerDTO {
 
     @NotBlank
     private String companyName;
+
     private String companyAddress;
 
-    @Size(max = 10,min = 10)
+//    @Size(max = 10,min = 10)
+    @Pattern(regexp="(^[0-9]{10}$)", message = "Contact Number should be of 10 digits.")
     private String companyContact;
 
     @NotBlank

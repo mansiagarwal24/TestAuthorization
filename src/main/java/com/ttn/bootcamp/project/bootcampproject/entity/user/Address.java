@@ -17,6 +17,7 @@ public class Address extends Audit {
     private String addressLine;
     private int zipCode;
     private String label; //(Ex. office/home)
+    private boolean isDelete;
 
     @ManyToOne
     @ToString.Exclude

@@ -11,6 +11,7 @@ import com.ttn.bootcamp.project.bootcampproject.repository.TokenRepo;
 import com.ttn.bootcamp.project.bootcampproject.security.JWTGenerator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,8 @@ public class SellerService {
     I18Service i18Service;
 //    @Autowired
 //    ImageService imageService;
+//    @Value("${basePath}")
+//    String basePath;
 
 
 
@@ -106,6 +109,7 @@ public class SellerService {
     }
 
     private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
+
     @Transactional
     public ResponseEntity<?> updateProfile(SellerUpdateDTO sellerUpdateDTO) throws IOException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();

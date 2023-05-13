@@ -17,7 +17,8 @@ public class CustomerDTO {
 
 
 //    @Pattern(regexp = "^(?=.*[0-9])")
-    @Size(min = 10,max = 10,message = "phone no is not valid,must contain 10 digits only")
+//    @Size(min = 10,max = 10,message = "phone no is not valid,must contain 10 digits only")
+    @Pattern(regexp="(^[0-9]{10}$)", message = "Contact Number should be of 10 digits.")
     private String phoneNo;
     @NotBlank
     private String firstName;
