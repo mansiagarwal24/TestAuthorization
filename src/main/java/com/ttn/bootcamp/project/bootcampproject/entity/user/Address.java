@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ttn.bootcamp.project.bootcampproject.Audit;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class Address extends Audit {
     private String label; //(Ex. office/home)
     private boolean isDelete;
 
+    @JsonIgnore
     @ManyToOne
     @ToString.Exclude
     private Customer customer;

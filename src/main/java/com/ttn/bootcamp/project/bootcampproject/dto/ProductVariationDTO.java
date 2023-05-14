@@ -1,20 +1,20 @@
 package com.ttn.bootcamp.project.bootcampproject.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ttn.bootcamp.project.bootcampproject.entity.product.Product;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.Map;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductVariationDTO {
-    private Long productId;
+    private Product product;
     private int quantity;
     private Long price;
-    private Map<String,String> metadataValues;
-    private boolean isActive;
+    private Long productId;
+    private String metadataValues;
+    private String productName;
+
 
     private MultipartFile image;
 

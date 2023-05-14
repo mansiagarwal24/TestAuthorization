@@ -6,11 +6,14 @@ import com.ttn.bootcamp.project.bootcampproject.Audit;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Product extends Audit {
     @Id
@@ -21,7 +24,7 @@ public class Product extends Audit {
     private String description;
 
     private String brand;
-    private boolean isCancellable=false,isActive=false,isReturnable=false,isDeleted=false;
+    private Boolean cancel=Boolean.FALSE,active=Boolean.FALSE,returnable=Boolean.FALSE,deleted=Boolean.FALSE;
 
     @ManyToOne
     @JoinColumn(name="sellerId")
@@ -29,11 +32,11 @@ public class Product extends Audit {
     private Seller seller;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name="categoryId")
     private Category category;
 
     @OneToMany(mappedBy = "product")
+
     @JsonIgnore
     private List<ProductVariation> productVariation;
 

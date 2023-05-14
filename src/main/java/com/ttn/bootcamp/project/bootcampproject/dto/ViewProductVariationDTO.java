@@ -12,13 +12,14 @@ public class ViewProductVariationDTO {
     private Long productId;
     private int quantity;
     private Long price;
-    private Map<String,String> metadataValues;
+    private String metadataValues;
     private boolean isActive;
     private String productName;
     private String brand;
     private String description;
     private String categoryName;
     private Long categoryId;
+    private String imageName;
     private List<CategoryMetadataFieldValues> categoryMetadataValues;
 //    private Category category;
 

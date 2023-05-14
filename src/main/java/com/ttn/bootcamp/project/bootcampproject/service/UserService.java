@@ -68,7 +68,7 @@ public class UserService {
             tokenRepo.delete(activeToken);
         }
 
-//        log.info(user.getEmail());
+        log.info(user.getEmail());
         Authentication authentication;
         try {
             authentication = authenticationManager.authenticate(
@@ -81,6 +81,7 @@ public class UserService {
                 user.setLocked(true);
                 user.setActive(false);
                 userRepo.save(user);
+                emailService.sendMail(loginDTO.getEmail(),"Account Status","Your account has been locked,You have successively 3 wrong attempts!!");
                 return new ResponseEntity<>("Invalid Attempts!!\n your account has been locked!!", HttpStatus.UNAUTHORIZED);
             }
             return new ResponseEntity<>("Incorrect Password!! please try again.",HttpStatus.UNAUTHORIZED);
@@ -94,6 +95,8 @@ public class UserService {
             accessToken.setToken(token);
             accessToken.setUser(user);
             accessToken.setEmail(user.getEmail());
+            user.setInvalidAttemptCount(0);
+            userRepo.save(user);
             tokenRepo.save(accessToken);
 
             return new ResponseEntity<>("Login Successfully. Your access token is : " + token, HttpStatus.OK);
@@ -113,21 +116,23 @@ public class UserService {
     }
 
     public ResponseEntity<?> forgotPassword(String email){
-        if(userRepo.existsByEmail(email)){
-            String token = jwtGenerator.generateToken(email);
-            emailService.sendMail(email,"Reset Password Link","Please use this link to reset your password again: "+"\n http://localhost:8080/user/resetPassword?token="+token);
-            return new ResponseEntity<>("Reset password link sent successfully ",HttpStatus.OK);
-        }
-        return new ResponseEntity<>(i18Service.getMsg("user.forgotPassword"),HttpStatus.BAD_REQUEST);
+        if(!userRepo.existsByEmail(email)) {
+            return new ResponseEntity<>(i18Service.getMsg("user.forgotPassword"),HttpStatus.BAD_REQUEST);
 
+        }
+        String token = jwtGenerator.generateToken(email);
+        emailService.sendMail(email,"Reset Password Link","Please use this link to reset your password again: "+"\n http://localhost:8080/user/resetPassword?token="+token);
+        return new ResponseEntity<>("Reset password link sent successfully ",HttpStatus.OK);
     }
 
     public ResponseEntity<?> resetPassword(String token,ResetPasswordDTO resetDTO){
         String email = jwtGenerator.getEmailFromJWT(token);
         User user = userRepo.findByEmail(email).orElseThrow(()-> new RuntimeException("User doesn't exist!!"));
         if (StringUtils.isBlank(resetDTO.getPassword())) {
+            log.error("Password is Blank!!");
             return new ResponseEntity<>("Password cannot be blank", HttpStatus.BAD_REQUEST);
         }
+
         if (!resetDTO.getPassword().equals(resetDTO.getConfirmPassword())) {
             return new ResponseEntity<>("Password doesn't match!!", HttpStatus.BAD_REQUEST);
         } else {
@@ -152,19 +157,23 @@ public class UserService {
         }
         user.setActive(true);
         userRepo.save(user);
+        emailService.sendMail(user.getEmail(), "Account Status ", "Your account has been activated!!");
         return new ResponseEntity<>(i18Service.getMsg("user.activate"),HttpStatus.OK);
     }
 
     public void resendEmail(String email){
-        if(userRepo.existsByEmail(email)){
-            User user = userRepo.findByEmail(email).get();
-            user.setExpiryTime(LocalDateTime.now().plusMinutes(15));
-            String token  = UUID.randomUUID().toString();
-            user.setRegistrationToken(token);
-            userRepo.save(user);
-            emailService.sendMail(email, "Activation Link ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + token);
+        if(!userRepo.existsByEmail(email)) {
+            throw new ResourcesNotFoundException("Email not found!!");
         }
-        throw new ResourcesNotFoundException("Email not found!!");
+
+        User user = userRepo.findByEmail(email).get();
+        if(user.isActive()){
+            throw new GenericMessageException("Your account is already activated!");
+        }
+        String token  = UUID.randomUUID().toString();
+        user.setRegistrationToken(token);
+        userRepo.save(user);
+        emailService.sendMail(email, "Activation Link ", "Please Activate your account by clicking on the below link" + "\n http://localhost:8080/user/activate?token=" + token);
     }
 
     @Transactional(value = Transactional.TxType.REQUIRES_NEW)

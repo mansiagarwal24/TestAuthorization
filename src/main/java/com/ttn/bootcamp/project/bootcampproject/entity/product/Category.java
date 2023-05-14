@@ -26,5 +26,6 @@ public class Category extends Audit {
     private Category parentCategory;
 
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    @ToString.Exclude
     List<CategoryMetadataFieldValues> categoryMetadataFieldValues;
 }

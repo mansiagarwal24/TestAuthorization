@@ -1,5 +1,6 @@
 package com.ttn.bootcamp.project.bootcampproject.service;
 
+import com.ttn.bootcamp.project.bootcampproject.dto.AddressDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.CustomerResponseDTO;
 import com.ttn.bootcamp.project.bootcampproject.dto.SellerResponseDTO;
@@ -7,6 +8,7 @@ import com.ttn.bootcamp.project.bootcampproject.entity.user.Customer;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Seller;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.Token;
 import com.ttn.bootcamp.project.bootcampproject.entity.user.User;
+import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.GenericMessageException;
 import com.ttn.bootcamp.project.bootcampproject.exceptionhandler.ResourcesNotFoundException;
 import com.ttn.bootcamp.project.bootcampproject.repository.CustomerRepo;
 import com.ttn.bootcamp.project.bootcampproject.repository.SellerRepo;
@@ -48,6 +50,7 @@ public class AdminService {
             customerResponseDTO.setActive(customer.isActive());
             customerResponseDTO.setFirstName(customer.getFirstName());
             customerResponseDTO.setLastName(customer.getLastName());
+            customerResponseDTO.setImage(customer.getProfileImage());
             customerList.add(customerResponseDTO);
         }
         return customerList;
@@ -66,7 +69,16 @@ public class AdminService {
             sellerResponseDTO.setLastName(seller.getLastName());
             sellerResponseDTO.setCompanyName(seller.getCompanyName());
             sellerResponseDTO.setCompanyContact(seller.getCompanyContact());
-            sellerResponseDTO.setCompanyAddress(seller.getAddress());
+            sellerResponseDTO.setImage(seller.getProfileImage());
+            AddressDTO addressDTO = new AddressDTO();
+            addressDTO.setAddressLine(seller.getAddress().getAddressLine());
+            addressDTO.setCity(seller.getAddress().getCity());
+            addressDTO.setState(seller.getAddress().getState());
+            addressDTO.setLabel(seller.getAddress().getLabel());
+            addressDTO.setZipCode(seller.getAddress().getZipCode());
+            addressDTO.setCountry(seller.getAddress().getCountry());
+
+            sellerResponseDTO.setCompanyAddress(addressDTO);
             sellerList.add(sellerResponseDTO);
         }
         return sellerList;

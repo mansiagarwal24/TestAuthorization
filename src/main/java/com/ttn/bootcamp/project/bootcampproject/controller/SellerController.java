@@ -78,8 +78,8 @@ public class SellerController {
         return new ResponseEntity<>("Product added Successfully!!",HttpStatus.OK);
     }
     @PostMapping("/addProductVariation")
-    public ResponseEntity<?> addProductVariation(@Valid @RequestBody ProductVariationDTO productVariationDTO){
-        productService.addProductVariation(productVariationDTO);
+    public ResponseEntity<?> addProductVariation(@Valid @ModelAttribute ProductVariationDTO productVariationDTO,@RequestPart("MetaData") String metadata){
+        productService.addProductVariation(productVariationDTO,metadata);
         return new ResponseEntity<>("Product Variation added Successfully!!",HttpStatus.OK);
     }
 
@@ -115,8 +115,8 @@ public class SellerController {
     }
 
     @PutMapping("/updateProductVariation")
-    public ResponseEntity<?> updateProductVariation(@RequestParam Long id,@ModelAttribute ProductVariationDTO productVariationDTO) throws IOException {
-        productService.updateProductVariation(id,productVariationDTO);
+    public ResponseEntity<?> updateProductVariation(@RequestParam Long id,@ModelAttribute ProductVariationDTO productVariationDTO,@RequestPart("metadata") String metadata) throws IOException {
+        productService.updateProductVariation(id,productVariationDTO,metadata);
         return new ResponseEntity<>("Product Variation updated Successfully!!",HttpStatus.OK);
     }
 

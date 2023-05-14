@@ -27,7 +27,7 @@ public class JWTGenerator {
     }
     public String generateToken(String email){
         Date currentDate = new Date();
-        Date expirationDateTime = new Date(currentDate.getTime()+SecurityConstant.JWT_EXPIRATION);
+        Date expirationDateTime = new Date(currentDate.getTime()+SecurityConstant.JWT_EXPIRATION_TIME);
 
         String token = Jwts.builder()
                 .setSubject(email)

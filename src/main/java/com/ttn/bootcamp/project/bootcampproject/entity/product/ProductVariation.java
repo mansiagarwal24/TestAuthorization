@@ -1,8 +1,9 @@
 package com.ttn.bootcamp.project.bootcampproject.entity.product;
 
-import com.ttn.bootcamp.project.bootcampproject.converter.HashMapConverter;
+
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.Type;
 
 import java.util.Map;
 
@@ -17,10 +18,10 @@ public class ProductVariation {
     private Long price;
     private boolean isActive=true;
 
-    @Convert(converter = HashMapConverter.class)
-    private Map<String,String> metaData;
-    //image
+
     private String primaryImageName;
+
+    private String metadata;
 
     @ManyToOne
     @JoinColumn(name="productId")

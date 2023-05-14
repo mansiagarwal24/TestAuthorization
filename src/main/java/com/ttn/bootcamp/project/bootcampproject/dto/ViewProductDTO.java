@@ -15,5 +15,6 @@ public class ViewProductDTO {
     private String categoryName;
     private String brand;
     private String description;
-    private Category category;
+    private Long categoryId;
+    private List<ProductVariationDTO> productVariation;
 }

@@ -16,6 +16,6 @@ public class Customer extends User{
     private String contact;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "customer",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer")
     private List<Address> addressList;
 }

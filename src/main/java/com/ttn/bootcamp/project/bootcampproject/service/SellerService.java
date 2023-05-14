@@ -54,7 +54,7 @@ public class SellerService {
         if(!sellerDTO.getPassword().equals(sellerDTO.getConfirmPassword())) {
             throw new GenericMessageException("Password doesn't match!!");
         }
-        if(sellerRepo.existsByCompanyName(sellerDTO.getCompanyName())){
+        if(sellerRepo.existsByCompanyNameIgnoreCase(sellerDTO.getCompanyName())){
             throw new GenericMessageException("Company Name is already registered with other seller");
         }
         if(sellerRepo.existsByGstNo(sellerDTO.getGstNO())){
@@ -102,12 +102,19 @@ public class SellerService {
         sellerResponseDTO.setCompanyName(seller.getCompanyName());
         sellerResponseDTO.setActive(seller.isActive());
         sellerResponseDTO.setImage(seller.getProfileImage());
+
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setAddressLine(seller.getAddress().getAddressLine());
+        addressDTO.setCity(seller.getAddress().getCity());
+        addressDTO.setState(seller.getAddress().getState());
+        addressDTO.setLabel(seller.getAddress().getLabel());
+        addressDTO.setZipCode(seller.getAddress().getZipCode());
+        addressDTO.setCountry(seller.getAddress().getCountry());
+
+        sellerResponseDTO.setCompanyAddress(addressDTO);
         return sellerResponseDTO;
 
     }
-
-//    private String basePath="/home/mansi/Downloads/bootcamp-project/images/";
-
 
     public void updateProfile(SellerUpdateDTO sellerUpdateDTO) throws IOException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -131,8 +138,7 @@ public class SellerService {
 
         seller.setProfileImage(basePath+seller.getUserId()+".jpg");
         sellerRepo.save(seller);
-        sellerUpdateDTO.getImage().transferTo(new File(basePath+sellerUpdateDTO.getImage().getOriginalFilename()));
-        sellerRepo.save(seller);
+        sellerUpdateDTO.getImage().transferTo(new File(basePath+seller.getUserId()+".jpg"));
     }
 
     public void updatePassword(ResetPasswordDTO resetPasswordDTO){

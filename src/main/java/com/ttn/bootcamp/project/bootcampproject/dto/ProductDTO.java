@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ProductDTO {
     @NotBlank
@@ -17,5 +19,8 @@ public class ProductDTO {
     private boolean isReturnable;
     @NotNull
     private Long categoryId;
+    private String categoryName;
+
+    private List<ProductVariationDTO> productVariation;
 
 }

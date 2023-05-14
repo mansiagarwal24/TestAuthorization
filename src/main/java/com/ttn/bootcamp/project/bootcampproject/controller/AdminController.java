@@ -35,7 +35,7 @@ public class AdminController {
     }
 
     @GetMapping("/sellers")
-    public ResponseEntity<?> getSeller(@RequestParam(defaultValue = "10",required = false) int pageOffSet,@RequestParam int pageSize,@RequestParam String sort){
+    public ResponseEntity<?> getSeller(@RequestParam(defaultValue = "0") int pageOffSet,@RequestParam(defaultValue = "10") int pageSize,@RequestParam String sort){
         List<SellerResponseDTO> sellerList = adminService.findAllSeller(pageOffSet, pageSize, sort);
         return new ResponseEntity<>(sellerList, HttpStatus.OK);
     }
@@ -128,6 +128,12 @@ public class AdminController {
     @GetMapping("/viewProductById")
     public ResponseEntity<?> viewProductById(@RequestParam Long id){
         return new ResponseEntity<>(productService.viewProductByAdmin(id),HttpStatus.OK);
+
+    }
+
+    @GetMapping("/viewAllProducts")
+    public ResponseEntity<?> viewAllProducts(@RequestParam int offSet, @RequestParam int size, @RequestParam Sort.Direction orderBy,@RequestParam String sortBy){
+        return new ResponseEntity<>(productService.viewAllProductsByAdmin(offSet, size, orderBy, sortBy),HttpStatus.OK);
 
     }
 }

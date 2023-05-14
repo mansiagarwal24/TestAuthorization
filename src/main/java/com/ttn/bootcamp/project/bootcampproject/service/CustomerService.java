@@ -40,13 +40,6 @@ public class CustomerService {
     @Autowired
     RoleRepo roleRepo;
 
-    @Autowired
-    I18Service i18Service;
-//    @Autowired
-//    ImageService imageService;
-//    @Value("${basePath}")
-//    String basePath;
-
 
     public void createCustomer(CustomerDTO customerDTO) {
         if(customerRepo.existsByEmail(customerDTO.getEmail())){

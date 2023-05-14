@@ -11,7 +11,7 @@ public class SellerResponseDTO {
     private String lastName;
     private String companyName;
     private boolean isActive;
-    private Address companyAddress;
+    private AddressDTO companyAddress;
     private String companyContact;
     private String image;
 }

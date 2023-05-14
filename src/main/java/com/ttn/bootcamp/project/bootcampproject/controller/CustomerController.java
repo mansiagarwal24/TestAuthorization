@@ -96,4 +96,9 @@ public class CustomerController {
     public ResponseEntity<?> viewAllProducts(@RequestParam Long id){
         return new ResponseEntity<>(productService.viewAllProductByCustomer(id),HttpStatus.OK);
     }
+
+    @GetMapping("/viewAllSimilarProduct/{id}")
+    public ResponseEntity<?> viewAllSimilarProducts(@PathVariable Long id,@RequestParam int offSet,@RequestParam int size,@RequestParam String orderBy,@RequestParam String sortBy){
+        return new ResponseEntity<>(productService.viewSimilarCustomerProducts(id,size,offSet,orderBy,sortBy),HttpStatus.OK);
+    }
 }

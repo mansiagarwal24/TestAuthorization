@@ -6,7 +6,7 @@ import lombok.Data;
 public class ProductUpdateDTO {
     private String productName;
     private String description;
-    private boolean isCancel;
-    private boolean isReturn;
+    private Boolean isCancel;
+    private Boolean isReturn;
     private String brand;
 }

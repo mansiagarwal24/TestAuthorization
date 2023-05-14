@@ -34,7 +34,7 @@ public class User extends Audit {
     private String profileImage;
     // TODO: ideally this should have a separate table. We will refactor it. This is s tech debt.
     private String registrationToken;
-    private LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
+    private LocalDateTime expiryTime = LocalDateTime.now().plusHours(30);
 
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Role> role;
