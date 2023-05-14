@@ -87,17 +87,17 @@ public class ProductService {
             throw new GenericMessageException("Product is not activated or deleted!!");
         }
 
-        String[] metadataPairs = metaData.split(",");
-        for (String pair : metadataPairs) {
-            String[] fieldAndValue = pair.split(":");
-            String field = fieldAndValue[0].replace("{"," ").trim();
-            String value = fieldAndValue[1].replaceAll("[^a-zA-Z0-9]"," ").trim();
-
-            if(!categoryMetadataFieldRepo.existsByFieldName(field)){
-                throw new GenericMessageException("Field Values doesn't exist!!");
-            }
-
-        }
+//        String[] metadataPairs = metaData.split(",");
+//        for (String pair : metadataPairs) {
+//            String[] fieldAndValue = pair.split(":");
+//            String field = fieldAndValue[0].replace("{"," ").trim();
+//            String value = fieldAndValue[1].replaceAll("[^a-zA-Z0-9]"," ").trim();
+//
+//            if(!categoryMetadataFieldRepo.existsByFieldName(field)){
+//                throw new GenericMessageException("Field Values doesn't exist!!");
+//            }
+//
+//        }
         ProductVariation productVariation = new ProductVariation();
         productVariation.setProduct(product);
         productVariation.setQuantityAvailable(productVariationDTO.getQuantity());
